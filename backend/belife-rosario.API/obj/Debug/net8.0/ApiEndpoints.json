@@ -1,0 +1,28 @@
+[
+  {
+    "ContainingType": "Belife.API.Controllers.CategoriaController",
+    "Method": "CrearCategoria",
+    "RelativePath": "api/categorias",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "Belife.API.DTOs.Categoria.CreateCategoriaDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Belife.API.Controllers.TestController",
+    "Method": "ProbarConexion",
+    "RelativePath": "api/test/conexion",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  }
+]
