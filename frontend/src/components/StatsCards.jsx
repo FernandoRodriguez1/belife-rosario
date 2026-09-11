@@ -1,5 +1,6 @@
-import { Package, Boxes, Wallet } from 'lucide-react';
+import { AlertTriangle, Boxes, Package, Wallet } from 'lucide-react';
 import { formatCurrency } from '../utils/formatCurrency';
+import { contarProductosStockBajo } from '../utils/stockAlerts';
 
 const cards = [
   {
@@ -23,23 +24,53 @@ const cards = [
     iconBg: 'bg-amber-100 text-amber-600',
     accent: 'bg-amber-400',
   },
+  {
+    label: 'Stock Bajo',
+    key: 'lowStock',
+    icon: AlertTriangle,
+    iconBg: 'bg-red-100 text-red-600',
+    accent: 'bg-red-500',
+    clickable: true,
+  },
 ];
 
-function StatsCards({ totalProducts, totalStock, inventoryValue }) {
+function StatsCards({
+  totalProducts,
+  totalStock,
+  inventoryValue,
+  products,
+  onlyLowStock,
+  onLowStockClick,
+}) {
+  const lowStockCount = contarProductosStockBajo(products ?? []);
   const values = {
     products: String(totalProducts),
     stock: String(totalStock),
     value: formatCurrency(inventoryValue),
+    lowStock: String(lowStockCount),
   };
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {cards.map((card) => {
         const Icon = card.icon;
+        const isClickable = Boolean(card.clickable);
+        const isActive = isClickable && onlyLowStock;
         return (
-          <div
+          <button
             key={card.key}
-            className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-shadow duration-150 hover:shadow-md"
+            type="button"
+            disabled={!isClickable}
+            onClick={isClickable ? onLowStockClick : undefined}
+            className={`relative overflow-hidden rounded-2xl border bg-white p-5 text-left shadow-sm transition-all duration-150 ${
+              isClickable
+                ? 'cursor-pointer hover:shadow-md'
+                : 'cursor-default'
+            } ${
+              isActive
+                ? 'border-red-400 ring-2 ring-red-500/30'
+                : 'border-gray-200'
+            }`}
           >
             <span className={`absolute inset-x-0 top-0 h-1 ${card.accent}`} />
             <div className="flex items-center gap-4">
@@ -49,13 +80,15 @@ function StatsCards({ totalProducts, totalStock, inventoryValue }) {
                 <Icon className="size-5" />
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-medium text-gray-500">{card.label}</p>
+                <p className="text-sm font-medium text-gray-500">
+                  {card.label}
+                </p>
                 <p className="mt-0.5 truncate font-display text-2xl font-bold text-gray-900">
                   {values[card.key]}
                 </p>
               </div>
             </div>
-          </div>
+          </button>
         );
       })}
     </div>

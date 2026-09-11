@@ -1,10 +1,12 @@
 import { useState, useMemo, useCallback } from 'react';
 import { initialProducts } from '../data/products';
+import { filtrarStockBajo } from '../utils/stockAlerts';
 
 export function useProducts() {
   const [products, setProducts] = useState(initialProducts);
   const [query, setQuery] = useState('');
   const [sortBy, setSortBy] = useState('name');
+  const [onlyLowStock, setOnlyLowStock] = useState(false);
 
   const addProduct = useCallback((product) => {
     setProducts((prev) => [
@@ -23,6 +25,14 @@ export function useProducts() {
     setProducts((prev) => prev.filter((p) => p.id !== id));
   }, []);
 
+  const deductStock = useCallback((id, quantity) => {
+    setProducts((prev) =>
+      prev.map((p) =>
+        p.id === id ? { ...p, stock: Math.max(0, p.stock - quantity) } : p
+      )
+    );
+  }, []);
+
   const totalProducts = products.length;
   const totalStock = products.reduce((sum, p) => sum + p.stock, 0);
   const inventoryValue = products.reduce(
@@ -33,13 +43,17 @@ export function useProducts() {
   const filteredProducts = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
-    const filtered = normalizedQuery
+    let visible = normalizedQuery
       ? products.filter((p) =>
           p.nombre.toLowerCase().includes(normalizedQuery)
         )
       : products;
 
-    return [...filtered].sort((a, b) => {
+    if (onlyLowStock) {
+      visible = filtrarStockBajo(visible);
+    }
+
+    return [...visible].sort((a, b) => {
       switch (sortBy) {
         case 'price':
           return a.precio_actual - b.precio_actual;
@@ -50,19 +64,23 @@ export function useProducts() {
           return a.nombre.localeCompare(b.nombre);
       }
     });
-  }, [products, query, sortBy]);
+  }, [products, query, sortBy, onlyLowStock]);
 
   return {
     products: filteredProducts,
+    allProducts: products,
     totalProducts,
     totalStock,
     inventoryValue,
     addProduct,
     updateProduct,
     deleteProduct,
+    deductStock,
     query,
     setQuery,
     sortBy,
     setSortBy,
+    onlyLowStock,
+    setOnlyLowStock,
   };
 }

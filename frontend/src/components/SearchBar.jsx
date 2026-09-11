@@ -1,7 +1,16 @@
-import { ArrowDownWideNarrow, Plus, Search } from 'lucide-react';
+import { AlertTriangle, ArrowDownWideNarrow, Plus, Search, ShoppingCart } from 'lucide-react';
 import Button from './Button';
 
-function SearchBar({ query, onQueryChange, sortBy, onSortChange, onNewProduct }) {
+function SearchBar({
+  query,
+  onQueryChange,
+  sortBy,
+  onSortChange,
+  onNewProduct,
+  onNewSale,
+  onlyLowStock,
+  onToggleLowStock,
+}) {
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
       <div className="relative flex-1">
@@ -15,6 +24,13 @@ function SearchBar({ query, onQueryChange, sortBy, onSortChange, onNewProduct })
         />
       </div>
       <div className="flex items-center gap-3">
+        <Button
+          variant={onlyLowStock ? 'primary' : 'secondary'}
+          onClick={onToggleLowStock}
+        >
+          <AlertTriangle className="size-4" />
+          Ver solo stock bajo
+        </Button>
         <div className="relative">
           <ArrowDownWideNarrow className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
           <select
@@ -27,6 +43,10 @@ function SearchBar({ query, onQueryChange, sortBy, onSortChange, onNewProduct })
             <option value="stock">Stock</option>
           </select>
         </div>
+        <Button variant="secondary" onClick={onNewSale}>
+          <ShoppingCart className="size-4" />
+          Nueva Venta
+        </Button>
         <Button onClick={onNewProduct}>
           <Plus className="size-4" />
           Nuevo Producto

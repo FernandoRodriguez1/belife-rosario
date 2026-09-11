@@ -1,17 +1,12 @@
-import { History, Package, Pencil, Trash2 } from 'lucide-react';
+import { AlertTriangle, History, Package, Pencil, Trash2 } from 'lucide-react';
 import Badge from './Badge';
 import { formatCurrency } from '../utils/formatCurrency';
+import { esStockBajo } from '../utils/stockAlerts';
 import { categorias } from '../data/categorias';
 
 const categoriaLookup = new Map(
   categorias.map((cat) => [cat.id, cat.nombre])
 );
-
-const stockBadge = (stock) => {
-  if (stock === 0) return 'text-red-600';
-  if (stock < 20) return 'text-amber-600';
-  return 'text-gray-900';
-};
 
 const estadoIndicator = (estado) =>
   estado === 'activo'
@@ -61,12 +56,17 @@ function ProductTable({ products, onEdit, onDelete, onHistory }) {
               const categoria =
                 categoriaLookup.get(product.categoria_id) ?? 'Sin categoría';
               const estado = estadoIndicator(product.estado);
+              const lowStock = esStockBajo(product);
               return (
                 <tr
                   key={product.id}
                   className="transition-colors duration-150 hover:bg-gray-50"
                 >
-                  <td className="px-6 py-4">
+                  <td
+                    className={`px-6 py-4 ${
+                      lowStock ? 'border-l-4 border-l-red-500' : ''
+                    }`}
+                  >
                     <div className="flex items-center gap-4">
                       <div className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-brand-50">
                         <Package className="size-5 text-brand-600" />
@@ -95,8 +95,17 @@ function ProductTable({ products, onEdit, onDelete, onHistory }) {
                   <td className="whitespace-nowrap px-6 py-4 font-display text-sm font-semibold text-gray-900">
                     {formatCurrency(product.precio_actual)}
                   </td>
-                  <td className={`whitespace-nowrap px-6 py-4 text-sm font-medium ${stockBadge(product.stock)}`}>
-                    {product.stock} u.
+                  <td className="whitespace-nowrap px-6 py-4">
+                    {lowStock ? (
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-red-100 px-2.5 py-1 text-sm font-semibold text-red-700">
+                        <AlertTriangle className="size-4" />
+                        {product.stock} u.
+                      </span>
+                    ) : (
+                      <span className="text-sm font-medium text-gray-900">
+                        {product.stock} u.
+                      </span>
+                    )}
                   </td>
                   <td className="whitespace-nowrap px-6 py-4">
                     <div className="flex items-center justify-end gap-1">

@@ -1,8 +1,9 @@
 import { useState, useCallback } from 'react';
 import { initialHistorial } from '../data/historialPrecios';
-import { currentAdmin } from '../utils/currentAdmin';
+import { useAuth } from './useAuth';
 
 export function usePriceHistory() {
+  const { currentUser } = useAuth();
   const [historial, setHistorial] = useState(initialHistorial);
 
   const addPriceChange = useCallback(
@@ -14,7 +15,7 @@ export function usePriceHistory() {
           {
             id: nextId,
             producto_id,
-            administrador_id: currentAdmin.id,
+            administrador_id: currentUser?.id ?? null,
             precio_anterior,
             precio_nuevo,
             fecha: new Date().toISOString(),
@@ -22,7 +23,7 @@ export function usePriceHistory() {
         ];
       });
     },
-    []
+    [currentUser]
   );
 
   const getHistoryForProduct = useCallback(
