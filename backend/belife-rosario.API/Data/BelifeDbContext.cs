@@ -33,6 +33,9 @@ public class BelifeDbContext : DbContext
             entity.Property(a => a.Id)
                 .HasColumnName("id");
 
+            entity.HasIndex(a => a.Nombre)
+                .IsUnique();
+
             entity.Property(a => a.Nombre)
                 .HasColumnName("nombre")
                 .HasMaxLength(100)
@@ -102,7 +105,16 @@ public class BelifeDbContext : DbContext
 
         modelBuilder.Entity<Producto>(entity =>
         {
-            entity.ToTable("producto");
+            entity.ToTable("producto", table =>
+            {
+                table.HasCheckConstraint(
+                    "ck_producto_precio_actual",
+                    "precio_actual >= 0");
+
+                table.HasCheckConstraint(
+                    "ck_producto_stock",
+                    "stock >= 0");
+            });
 
             entity.HasKey(p => p.Id);
 
@@ -146,11 +158,13 @@ public class BelifeDbContext : DbContext
 
             entity.Property(p => p.FechaCreacion)
                 .HasColumnName("fecha_creacion")
+                .HasColumnType("timestamp without time zone")
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .IsRequired();
 
             entity.Property(p => p.FechaUltimaModificacion)
                 .HasColumnName("fecha_ultima_modificacion")
+                .HasColumnType("timestamp without time zone")
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .IsRequired();
 
@@ -201,6 +215,7 @@ public class BelifeDbContext : DbContext
 
             entity.Property(h => h.Fecha)
                 .HasColumnName("fecha")
+                .HasColumnType("timestamp without time zone")
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .IsRequired();
 
@@ -224,5 +239,46 @@ public class BelifeDbContext : DbContext
                 .HasForeignKey(h => h.AdministradorId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
+    }
+
+
+    // =========================================================
+    // ACTUALIZACIÓN AUTOMÁTICA DE FECHAS
+    // =========================================================
+
+    public override int SaveChanges(bool acceptAllChangesOnSuccess)
+    {
+        ActualizarFechasProductos();
+
+        return base.SaveChanges(acceptAllChangesOnSuccess);
+    }
+
+    public override Task<int> SaveChangesAsync(
+        bool acceptAllChangesOnSuccess,
+        CancellationToken cancellationToken = default)
+    {
+        ActualizarFechasProductos();
+
+        return base.SaveChangesAsync(
+            acceptAllChangesOnSuccess,
+            cancellationToken);
+    }
+
+    private void ActualizarFechasProductos()
+    {
+        var ahora = DateTime.UtcNow;
+
+        foreach (var entry in ChangeTracker.Entries<Producto>())
+        {
+            if (entry.State == EntityState.Added)
+            {
+                entry.Entity.FechaCreacion = ahora;
+                entry.Entity.FechaUltimaModificacion = ahora;
+            }
+            else if (entry.State == EntityState.Modified)
+            {
+                entry.Entity.FechaUltimaModificacion = ahora;
+            }
+        }
     }
 }
