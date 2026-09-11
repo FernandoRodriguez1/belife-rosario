@@ -1,0 +1,42 @@
+export const initialHistorial = [
+  {
+    id: 1,
+    producto_id: 1,
+    administrador_id: 1,
+    precio_anterior: 2400,
+    precio_nuevo: 2800,
+    fecha: '2026-06-15T10:30:00',
+  },
+  {
+    id: 2,
+    producto_id: 1,
+    administrador_id: 2,
+    precio_anterior: 2200,
+    precio_nuevo: 2400,
+    fecha: '2026-04-08T14:15:00',
+  },
+  {
+    id: 3,
+    producto_id: 2,
+    administrador_id: 1,
+    precio_anterior: 4200,
+    precio_nuevo: 4500,
+    fecha: '2026-07-22T09:45:00',
+  },
+  {
+    id: 4,
+    producto_id: 3,
+    administrador_id: 1,
+    precio_anterior: 3000,
+    precio_nuevo: 3200,
+    fecha: '2026-08-05T16:20:00',
+  },
+  {
+    id: 5,
+    producto_id: 3,
+    administrador_id: 2,
+    precio_anterior: 2800,
+    precio_nuevo: 3000,
+    fecha: '2026-05-19T11:05:00',
+  },
+];
