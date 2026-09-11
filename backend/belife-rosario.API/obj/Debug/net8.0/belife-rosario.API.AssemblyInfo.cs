@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("belife-rosario.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4d7bdc430c1f0ad9c9ae149f339c6f98cd9aba44")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e3144618c0026ea90295fec27266a967b3fe4338")]
 [assembly: System.Reflection.AssemblyProductAttribute("belife-rosario.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("belife-rosario.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

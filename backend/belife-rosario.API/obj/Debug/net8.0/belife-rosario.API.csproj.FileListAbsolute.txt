@@ -114,7 +114,6 @@ C:\Users\fr300\OneDrive\Escritorio\belife-rosario\belife-rosario\backend\belife-
 C:\Users\fr300\OneDrive\Escritorio\belife-rosario\belife-rosario\backend\belife-rosario.API\obj\Debug\net8.0\staticwebassets.development.json
 C:\Users\fr300\OneDrive\Escritorio\belife-rosario\belife-rosario\backend\belife-rosario.API\obj\Debug\net8.0\staticwebassets.build.endpoints.json
 C:\Users\fr300\OneDrive\Escritorio\belife-rosario\belife-rosario\backend\belife-rosario.API\obj\Debug\net8.0\swae.build.ex.cache
-C:\Users\fr300\OneDrive\Escritorio\belife-rosario\belife-rosario\backend\belife-rosario.API\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
 C:\Users\fr300\OneDrive\Escritorio\belife-rosario\belife-rosario\backend\belife-rosario.API\obj\Debug\net8.0\belife-r.A195E242.Up2Date
 C:\Users\fr300\OneDrive\Escritorio\belife-rosario\belife-rosario\backend\belife-rosario.API\obj\Debug\net8.0\belife-rosario.API.dll
 C:\Users\fr300\OneDrive\Escritorio\belife-rosario\belife-rosario\backend\belife-rosario.API\obj\Debug\net8.0\refint\belife-rosario.API.dll

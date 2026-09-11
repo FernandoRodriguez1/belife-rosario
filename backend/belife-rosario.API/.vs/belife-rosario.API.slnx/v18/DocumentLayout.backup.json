@@ -3,48 +3,48 @@
   "WorkspaceRootPath": "C:\\Users\\fr300\\OneDrive\\Escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.API\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{96A9DE9C-5C64-4275-9592-98A5A0C92DA8}|belife-rosario.API.csproj|c:\\users\\fr300\\onedrive\\escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.api\\data\\belifedbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{96A9DE9C-5C64-4275-9592-98A5A0C92DA8}|belife-rosario.API.csproj|solutionrelative:data\\belifedbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{AA396A72-5474-F034-9ACA-8C13B01AAE9F}|belife-rosario.API.csproj|c:\\users\\fr300\\onedrive\\escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.api\\data\\belifedbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AA396A72-5474-F034-9ACA-8C13B01AAE9F}|belife-rosario.API.csproj|solutionrelative:data\\belifedbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{96A9DE9C-5C64-4275-9592-98A5A0C92DA8}|belife-rosario.API.csproj|c:\\users\\fr300\\onedrive\\escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.api\\dtos\\createcategoriadto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{96A9DE9C-5C64-4275-9592-98A5A0C92DA8}|belife-rosario.API.csproj|solutionrelative:dtos\\createcategoriadto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{AA396A72-5474-F034-9ACA-8C13B01AAE9F}|belife-rosario.API.csproj|c:\\users\\fr300\\onedrive\\escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.api\\models\\administrador.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AA396A72-5474-F034-9ACA-8C13B01AAE9F}|belife-rosario.API.csproj|solutionrelative:models\\administrador.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{96A9DE9C-5C64-4275-9592-98A5A0C92DA8}|belife-rosario.API.csproj|c:\\users\\fr300\\onedrive\\escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.api\\controllers\\categoriacontrollertemp.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{96A9DE9C-5C64-4275-9592-98A5A0C92DA8}|belife-rosario.API.csproj|solutionrelative:controllers\\categoriacontrollertemp.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{AA396A72-5474-F034-9ACA-8C13B01AAE9F}|belife-rosario.API.csproj|c:\\users\\fr300\\onedrive\\escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.api\\models\\producto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AA396A72-5474-F034-9ACA-8C13B01AAE9F}|belife-rosario.API.csproj|solutionrelative:models\\producto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{96A9DE9C-5C64-4275-9592-98A5A0C92DA8}|belife-rosario.API.csproj|c:\\users\\fr300\\onedrive\\escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{96A9DE9C-5C64-4275-9592-98A5A0C92DA8}|belife-rosario.API.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+      "AbsoluteMoniker": "D:0:0:{AA396A72-5474-F034-9ACA-8C13B01AAE9F}|belife-rosario.API.csproj|c:\\users\\fr300\\onedrive\\escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.api\\models\\marca.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AA396A72-5474-F034-9ACA-8C13B01AAE9F}|belife-rosario.API.csproj|solutionrelative:models\\marca.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{96A9DE9C-5C64-4275-9592-98A5A0C92DA8}|belife-rosario.API.csproj|c:\\users\\fr300\\onedrive\\escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.api\\models\\producto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{96A9DE9C-5C64-4275-9592-98A5A0C92DA8}|belife-rosario.API.csproj|solutionrelative:models\\producto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{AA396A72-5474-F034-9ACA-8C13B01AAE9F}|belife-rosario.API.csproj|c:\\users\\fr300\\onedrive\\escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.api\\models\\historialprecio.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AA396A72-5474-F034-9ACA-8C13B01AAE9F}|belife-rosario.API.csproj|solutionrelative:models\\historialprecio.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{96A9DE9C-5C64-4275-9592-98A5A0C92DA8}|belife-rosario.API.csproj|c:\\users\\fr300\\onedrive\\escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.api\\models\\marca.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{96A9DE9C-5C64-4275-9592-98A5A0C92DA8}|belife-rosario.API.csproj|solutionrelative:models\\marca.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{AA396A72-5474-F034-9ACA-8C13B01AAE9F}|belife-rosario.API.csproj|c:\\users\\fr300\\onedrive\\escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.api\\models\\categoria.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AA396A72-5474-F034-9ACA-8C13B01AAE9F}|belife-rosario.API.csproj|solutionrelative:models\\categoria.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{96A9DE9C-5C64-4275-9592-98A5A0C92DA8}|belife-rosario.API.csproj|c:\\users\\fr300\\onedrive\\escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.api\\models\\categoria.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{96A9DE9C-5C64-4275-9592-98A5A0C92DA8}|belife-rosario.API.csproj|solutionrelative:models\\categoria.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{AA396A72-5474-F034-9ACA-8C13B01AAE9F}|belife-rosario.API.csproj|c:\\users\\fr300\\onedrive\\escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{AA396A72-5474-F034-9ACA-8C13B01AAE9F}|belife-rosario.API.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{96A9DE9C-5C64-4275-9592-98A5A0C92DA8}|belife-rosario.API.csproj|c:\\users\\fr300\\onedrive\\escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.api\\models\\administrador.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{96A9DE9C-5C64-4275-9592-98A5A0C92DA8}|belife-rosario.API.csproj|solutionrelative:models\\administrador.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{AA396A72-5474-F034-9ACA-8C13B01AAE9F}|belife-rosario.API.csproj|c:\\users\\fr300\\onedrive\\escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.api\\dtos\\createcategoriadto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AA396A72-5474-F034-9ACA-8C13B01AAE9F}|belife-rosario.API.csproj|solutionrelative:dtos\\createcategoriadto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{96A9DE9C-5C64-4275-9592-98A5A0C92DA8}|belife-rosario.API.csproj|c:\\users\\fr300\\onedrive\\escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.api\\controllers\\testcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{96A9DE9C-5C64-4275-9592-98A5A0C92DA8}|belife-rosario.API.csproj|solutionrelative:controllers\\testcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{AA396A72-5474-F034-9ACA-8C13B01AAE9F}|belife-rosario.API.csproj|c:\\users\\fr300\\onedrive\\escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.api\\controllers\\categoriacontrollertemp.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AA396A72-5474-F034-9ACA-8C13B01AAE9F}|belife-rosario.API.csproj|solutionrelative:controllers\\categoriacontrollertemp.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{96A9DE9C-5C64-4275-9592-98A5A0C92DA8}|belife-rosario.API.csproj|c:\\users\\fr300\\onedrive\\escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{96A9DE9C-5C64-4275-9592-98A5A0C92DA8}|belife-rosario.API.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{AA396A72-5474-F034-9ACA-8C13B01AAE9F}|belife-rosario.API.csproj|c:\\users\\fr300\\onedrive\\escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.api\\controllers\\testcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AA396A72-5474-F034-9ACA-8C13B01AAE9F}|belife-rosario.API.csproj|solutionrelative:controllers\\testcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{96A9DE9C-5C64-4275-9592-98A5A0C92DA8}|belife-rosario.API.csproj|c:\\users\\fr300\\onedrive\\escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.api\\models\\historialprecio.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{96A9DE9C-5C64-4275-9592-98A5A0C92DA8}|belife-rosario.API.csproj|solutionrelative:models\\historialprecio.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{AA396A72-5474-F034-9ACA-8C13B01AAE9F}|belife-rosario.API.csproj|c:\\users\\fr300\\onedrive\\escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AA396A72-5474-F034-9ACA-8C13B01AAE9F}|belife-rosario.API.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -58,7 +58,7 @@
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 7,
               "Title": "CreateCategoriaDto.cs",
               "DocumentMoniker": "C:\\Users\\fr300\\OneDrive\\Escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.API\\DTOs\\CreateCategoriaDto.cs",
               "RelativeDocumentMoniker": "DTOs\\CreateCategoriaDto.cs",
@@ -66,12 +66,11 @@
               "RelativeToolTip": "DTOs\\CreateCategoriaDto.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-09-10T22:45:37.426Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-09-10T22:45:37.426Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 8,
               "Title": "CategoriaControllerTemp.cs",
               "DocumentMoniker": "C:\\Users\\fr300\\OneDrive\\Escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.API\\Controllers\\CategoriaControllerTemp.cs",
               "RelativeDocumentMoniker": "Controllers\\CategoriaControllerTemp.cs",
@@ -79,12 +78,11 @@
               "RelativeToolTip": "Controllers\\CategoriaControllerTemp.cs",
               "ViewState": "AgIAAAsAAAAAAAAAAAAQwCAAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-09-10T22:44:09.066Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-09-10T22:44:09.066Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 9,
               "Title": "TestController.cs",
               "DocumentMoniker": "C:\\Users\\fr300\\OneDrive\\Escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.API\\Controllers\\TestController.cs",
               "RelativeDocumentMoniker": "Controllers\\TestController.cs",
@@ -92,12 +90,11 @@
               "RelativeToolTip": "Controllers\\TestController.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-09-10T22:38:23.267Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-09-10T22:38:23.267Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 10,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\fr300\\OneDrive\\Escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.API\\Program.cs",
               "RelativeDocumentMoniker": "Program.cs",
@@ -105,12 +102,11 @@
               "RelativeToolTip": "Program.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAB4AAAAKAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-09-10T22:37:48.04Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-09-10T22:37:48.04Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 6,
               "Title": "appsettings.json",
               "DocumentMoniker": "C:\\Users\\fr300\\OneDrive\\Escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.API\\appsettings.json",
               "RelativeDocumentMoniker": "appsettings.json",
@@ -129,72 +125,72 @@
               "RelativeDocumentMoniker": "Data\\BelifeDbContext.cs",
               "ToolTip": "C:\\Users\\fr300\\OneDrive\\Escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.API\\Data\\BelifeDbContext.cs",
               "RelativeToolTip": "Data\\BelifeDbContext.cs",
-              "ViewState": "AgIAAMEAAAAAAAAAAAAwwOMAAAABAAAAAAAAAA==",
+              "ViewState": "AgIAAGQAAAAAAAAAAAAgwDQAAAALAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-09-10T22:34:57.197Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 4,
               "Title": "HistorialPrecio.cs",
               "DocumentMoniker": "C:\\Users\\fr300\\OneDrive\\Escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.API\\Models\\HistorialPrecio.cs",
               "RelativeDocumentMoniker": "Models\\HistorialPrecio.cs",
               "ToolTip": "C:\\Users\\fr300\\OneDrive\\Escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.API\\Models\\HistorialPrecio.cs",
               "RelativeToolTip": "Models\\HistorialPrecio.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAABAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-09-10T22:29:57.967Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 2,
               "Title": "Producto.cs",
               "DocumentMoniker": "C:\\Users\\fr300\\OneDrive\\Escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.API\\Models\\Producto.cs",
               "RelativeDocumentMoniker": "Models\\Producto.cs",
               "ToolTip": "C:\\Users\\fr300\\OneDrive\\Escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.API\\Models\\Producto.cs",
               "RelativeToolTip": "Models\\Producto.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-09-10T22:29:48.726Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 3,
               "Title": "Marca.cs",
               "DocumentMoniker": "C:\\Users\\fr300\\OneDrive\\Escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.API\\Models\\Marca.cs",
               "RelativeDocumentMoniker": "Models\\Marca.cs",
               "ToolTip": "C:\\Users\\fr300\\OneDrive\\Escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.API\\Models\\Marca.cs",
               "RelativeToolTip": "Models\\Marca.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-09-10T22:29:40.927Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 5,
               "Title": "Categoria.cs",
               "DocumentMoniker": "C:\\Users\\fr300\\OneDrive\\Escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.API\\Models\\Categoria.cs",
               "RelativeDocumentMoniker": "Models\\Categoria.cs",
               "ToolTip": "C:\\Users\\fr300\\OneDrive\\Escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.API\\Models\\Categoria.cs",
               "RelativeToolTip": "Models\\Categoria.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-09-10T22:29:32.543Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 1,
               "Title": "Administrador.cs",
               "DocumentMoniker": "C:\\Users\\fr300\\OneDrive\\Escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.API\\Models\\Administrador.cs",
               "RelativeDocumentMoniker": "Models\\Administrador.cs",
               "ToolTip": "C:\\Users\\fr300\\OneDrive\\Escritorio\\belife-rosario\\belife-rosario\\backend\\belife-rosario.API\\Models\\Administrador.cs",
               "RelativeToolTip": "Models\\Administrador.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-09-10T22:29:23.747Z",
               "EditorCaption": ""
