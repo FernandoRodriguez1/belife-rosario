@@ -1,3 +1,5 @@
+// TODO backend: el campo "stock_minimo" todavía no existe en el esquema real
+// (tabla PRODUCTO). Confirmar con el equipo de backend que lo agreguen.
 export const initialProducts = [
   {
     id: 1,
@@ -7,6 +9,7 @@ export const initialProducts = [
     marca_id: 1,
     precio_actual: 2800,
     stock: 45,
+    stock_minimo: 5,
     estado: 'activo',
   },
   {
@@ -17,6 +20,7 @@ export const initialProducts = [
     marca_id: 2,
     precio_actual: 4500,
     stock: 30,
+    stock_minimo: 5,
     estado: 'activo',
   },
   {
@@ -27,6 +31,7 @@ export const initialProducts = [
     marca_id: 1,
     precio_actual: 3200,
     stock: 60,
+    stock_minimo: 5,
     estado: 'activo',
   },
   {
@@ -37,6 +42,7 @@ export const initialProducts = [
     marca_id: 2,
     precio_actual: 1900,
     stock: 80,
+    stock_minimo: 5,
     estado: 'activo',
   },
   {
@@ -47,6 +53,7 @@ export const initialProducts = [
     marca_id: 1,
     precio_actual: 2400,
     stock: 35,
+    stock_minimo: 5,
     estado: 'activo',
   },
   {
@@ -57,6 +64,7 @@ export const initialProducts = [
     marca_id: 2,
     precio_actual: 3100,
     stock: 25,
+    stock_minimo: 5,
     estado: 'inactivo',
   },
   {
@@ -67,6 +75,7 @@ export const initialProducts = [
     marca_id: 2,
     precio_actual: 1700,
     stock: 50,
+    stock_minimo: 5,
     estado: 'activo',
   },
   {
@@ -77,6 +86,7 @@ export const initialProducts = [
     marca_id: 2,
     precio_actual: 2200,
     stock: 40,
+    stock_minimo: 5,
     estado: 'activo',
   },
   {
@@ -87,6 +97,7 @@ export const initialProducts = [
     marca_id: 1,
     precio_actual: 1500,
     stock: 20,
+    stock_minimo: 5,
     estado: 'activo',
   },
   {
@@ -97,6 +108,7 @@ export const initialProducts = [
     marca_id: 1,
     precio_actual: 1800,
     stock: 55,
+    stock_minimo: 5,
     estado: 'activo',
   },
 ];

@@ -17,6 +17,7 @@ function ProductModal({ product = null, onClose, onSave }) {
           marca_id: product.marca_id ?? '',
           precio_actual: String(product.precio_actual),
           stock: String(product.stock),
+          stock_minimo: String(product.stock_minimo ?? 5),
           estado: product.estado ?? 'activo',
         }
       : {
@@ -26,6 +27,7 @@ function ProductModal({ product = null, onClose, onSave }) {
           marca_id: '',
           precio_actual: '',
           stock: '',
+          stock_minimo: '5',
           estado: 'activo',
         }
   );
@@ -54,6 +56,11 @@ function ProductModal({ product = null, onClose, onSave }) {
     } else if (Number(form.stock) < 0) {
       nextErrors.stock = 'El stock no puede ser negativo.';
     }
+    if (!form.stock_minimo) {
+      nextErrors.stock_minimo = 'El stock mínimo es obligatorio.';
+    } else if (Number(form.stock_minimo) < 0) {
+      nextErrors.stock_minimo = 'El stock mínimo no puede ser negativo.';
+    }
 
     return nextErrors;
   };
@@ -72,6 +79,7 @@ function ProductModal({ product = null, onClose, onSave }) {
       marca_id: form.marca_id ? Number(form.marca_id) : null,
       precio_actual: Number(form.precio_actual),
       stock: Number(form.stock),
+      stock_minimo: Number(form.stock_minimo),
       estado: form.estado,
     };
 
@@ -257,6 +265,27 @@ function ProductModal({ product = null, onClose, onSave }) {
               />
               {errors.stock && (
                 <p className="mt-1 text-xs text-red-600">{errors.stock}</p>
+              )}
+            </div>
+            <div className="sm:col-span-2">
+              <label className={labelClass} htmlFor="stock_minimo">
+                Stock Mínimo (unidades) <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="stock_minimo"
+                name="stock_minimo"
+                type="number"
+                min="0"
+                step="1"
+                value={form.stock_minimo}
+                onChange={handleChange}
+                placeholder="5"
+                className={fieldClass(Boolean(errors.stock_minimo))}
+              />
+              {errors.stock_minimo && (
+                <p className="mt-1 text-xs text-red-600">
+                  {errors.stock_minimo}
+                </p>
               )}
             </div>
           </div>
