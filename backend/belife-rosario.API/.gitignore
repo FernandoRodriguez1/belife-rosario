@@ -1,0 +1,29 @@
+## Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Bb]in/
+[Oo]bj/
+
+## Visual Studio
+.vs/
+*.user
+*.suo
+*.userprefs
+*.userosscache
+*.sln.docstates
+
+## JetBrains Rider / ReSharper
+.idea/
+_ReSharper*/
+*.DotSettings.user
+
+## Configuraciones locales que contienen secretos
+appsettings.Development.json
+appsettings.Local.json
+
+## Archivos generados / runtime
+*.log
+*.tmp
+*.cache

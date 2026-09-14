@@ -32,4 +32,7 @@ public class Producto
     // Relación 1:N con HistorialPrecio
     public ICollection<HistorialPrecio> HistorialPrecios { get; set; }
         = new List<HistorialPrecio>();
+
+    public ICollection<DetalleVenta> DetallesVenta { get; set; }
+    = new List<DetalleVenta>();
 }

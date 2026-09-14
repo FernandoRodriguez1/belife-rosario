@@ -10,11 +10,13 @@ public class BelifeDbContext : DbContext
     {
     }
 
-    public DbSet<Administrador> Administradores => Set<Administrador>();
-    public DbSet<Categoria> Categorias => Set<Categoria>();
-    public DbSet<Marca> Marcas => Set<Marca>();
-    public DbSet<Producto> Productos => Set<Producto>();
-    public DbSet<HistorialPrecio> HistorialPrecios => Set<HistorialPrecio>();
+    public DbSet<Administrador> Administradores { get; set; }
+    public DbSet<Categoria> Categorias { get; set; }
+    public DbSet<Marca> Marcas { get; set; }
+    public DbSet<Producto> Productos { get; set; }
+    public DbSet<HistorialPrecio> HistorialPrecios { get; set; }
+    public DbSet<Venta> Ventas { get; set; }
+    public DbSet<DetalleVenta> DetallesVenta { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -239,6 +241,109 @@ public class BelifeDbContext : DbContext
                 .HasForeignKey(h => h.AdministradorId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
+
+        // =========================================================
+        // VENTAS
+        // =========================================================
+        modelBuilder.Entity<Venta>(entity =>
+        {
+            entity.ToTable("venta", table =>
+            {
+                table.HasCheckConstraint(
+                    "ck_venta_monto",
+                    "monto >= 0");
+            });
+
+            entity.HasKey(v => v.Id);
+
+            entity.Property(v => v.Id)
+                .HasColumnName("id");
+
+            entity.Property(v => v.Monto)
+                .HasColumnName("monto")
+                .HasPrecision(12, 2)
+                .IsRequired();
+
+            entity.Property(v => v.FormaPago)
+                .HasColumnName("forma_pago")
+                .HasConversion<string>()
+                .HasMaxLength(30)
+                .IsRequired(false);
+
+            entity.Property(v => v.FechaHora)
+                .HasColumnName("fecha_hora")
+                .HasColumnType("timestamp without time zone")
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .IsRequired();
+
+            entity.HasIndex(v => v.FechaHora)
+                .HasDatabaseName("ix_venta_fecha_hora");
+        });
+
+        // =========================================================
+        // DETALLE VENTA
+        // =========================================================
+
+        modelBuilder.Entity<DetalleVenta>(entity =>
+        {
+            entity.ToTable("detalle_venta", table =>
+            {
+                table.HasCheckConstraint(
+                    "ck_detalle_venta_cantidad",
+                    "cantidad > 0");
+
+                table.HasCheckConstraint(
+                    "ck_detalle_venta_precio_unitario",
+                    "precio_unitario >= 0");
+
+                table.HasCheckConstraint(
+                    "ck_detalle_venta_subtotal",
+                    "subtotal >= 0");
+            });
+
+            entity.HasKey(d => d.Id);
+
+            entity.Property(d => d.Id)
+                .HasColumnName("id");
+
+            entity.Property(d => d.VentaId)
+                .HasColumnName("venta_id")
+                .IsRequired();
+
+            entity.Property(d => d.ProductoId)
+                .HasColumnName("producto_id")
+                .IsRequired();
+
+            entity.Property(d => d.Cantidad)
+                .HasColumnName("cantidad")
+                .IsRequired();
+
+            entity.Property(d => d.PrecioUnitario)
+                .HasColumnName("precio_unitario")
+                .HasPrecision(12, 2)
+                .IsRequired();
+
+            entity.Property(d => d.Subtotal)
+                .HasColumnName("subtotal")
+                .HasPrecision(12, 2)
+                .IsRequired();
+
+            entity.HasIndex(d => d.VentaId)
+                .HasDatabaseName("ix_detalle_venta_venta_id");
+
+            entity.HasIndex(d => d.ProductoId)
+                .HasDatabaseName("ix_detalle_venta_producto_id");
+
+            entity.HasOne(d => d.Venta)
+                .WithMany(v => v.Detalles)
+                .HasForeignKey(d => d.VentaId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(d => d.Producto)
+                .WithMany(p => p.DetallesVenta)
+                .HasForeignKey(d => d.ProductoId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
     }
 
 
@@ -266,7 +371,7 @@ public class BelifeDbContext : DbContext
 
     private void ActualizarFechasProductos()
     {
-        var ahora = DateTime.UtcNow;
+        var ahora = DateTime.Now;
 
         foreach (var entry in ChangeTracker.Entries<Producto>())
         {
