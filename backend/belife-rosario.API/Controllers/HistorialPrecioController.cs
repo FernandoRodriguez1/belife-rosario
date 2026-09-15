@@ -1,5 +1,7 @@
 using Belife.API.Data;
 using Belife.API.DTOs.HistorialPrecio;
+using Belife.API.Models;
+using Belife.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -82,7 +84,7 @@ public class HistorialPrecioController : ControllerBase
             ProductoId = dto.ProductoId,
             PrecioAnterior = producto.PrecioActual,
             PrecioNuevo = dto.PrecioNuevo,
-            Fecha = DateTime.Now,
+            Fecha = HoraArgentina.Ahora(),
             AdministradorId = dto.AdministradorId
         };
 

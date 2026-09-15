@@ -1,3 +1,5 @@
+using Belife.API.Enums;
+
 namespace Belife.API.DTOs.DetalleVenta;
 
 public class DetalleVentaResponseDto
@@ -9,6 +11,8 @@ public class DetalleVentaResponseDto
     public int ProductoId { get; set; }
 
     public string ProductoNombre { get; set; } = null!;
+
+    public UnidadMedida UnidadMedida { get; set; }
 
     public int Cantidad { get; set; }
 

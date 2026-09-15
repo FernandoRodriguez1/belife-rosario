@@ -1,5 +1,7 @@
 ﻿
 
+using Belife.API.Enums;
+
 namespace Belife.API.Models;
 
 public class Producto
@@ -19,6 +21,8 @@ public class Producto
     public int Stock { get; set; }
 
     public bool Estado { get; set; } = true;
+
+    public UnidadMedida UnidadMedida { get; set; }
 
     public DateTime FechaCreacion { get; set; }
 
