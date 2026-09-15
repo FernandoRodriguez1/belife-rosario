@@ -2,6 +2,7 @@ using Belife.API.Data;
 using Belife.API.DTOs.DetalleVenta;
 using Belife.API.DTOs.Venta;
 using Belife.API.Models;
+using Belife.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -54,7 +55,11 @@ public class VentaController : ControllerBase
         if (dto.Detalles is null || dto.Detalles.Count == 0)
             return BadRequest("La venta debe incluir al menos un detalle.");
 
-        var venta = new Venta { FormaPago = dto.FormaPago };
+        var venta = new Venta
+        {
+            FormaPago = dto.FormaPago,
+            FechaHora = HoraArgentina.Ahora()
+        };
 
         foreach (var detalleDto in dto.Detalles)
         {
@@ -62,6 +67,9 @@ public class VentaController : ControllerBase
 
             if (producto is null)
                 return BadRequest($"El producto {detalleDto.ProductoId} no existe.");
+
+            if (!producto.Estado)
+                return Conflict($"El producto {producto.Nombre} está inactivo y no se puede vender.");
 
             if (detalleDto.Cantidad <= 0)
                 return BadRequest($"La cantidad del producto {producto.Nombre} debe ser mayor a 0.");
@@ -147,6 +155,7 @@ public class VentaController : ControllerBase
                 VentaId = d.VentaId,
                 ProductoId = d.ProductoId,
                 ProductoNombre = d.Producto.Nombre,
+                UnidadMedida = d.Producto.UnidadMedida,
                 Cantidad = d.Cantidad,
                 PrecioUnitario = d.PrecioUnitario,
                 Subtotal = d.Subtotal

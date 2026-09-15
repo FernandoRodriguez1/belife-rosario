@@ -1,4 +1,5 @@
 ﻿using Belife.API.Models;
+using Belife.API.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace Belife.API.Data;
@@ -158,16 +159,26 @@ public class BelifeDbContext : DbContext
                 .HasDefaultValue(true)
                 .IsRequired();
 
+            entity.Property(p => p.UnidadMedida)
+                .HasColumnName("unidad_medida")
+                .HasConversion<string>()
+                .HasMaxLength(20)
+                .IsRequired();
+
             entity.Property(p => p.FechaCreacion)
                 .HasColumnName("fecha_creacion")
                 .HasColumnType("timestamp without time zone")
-                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                 .HasDefaultValueSql(
+        "CURRENT_TIMESTAMP AT TIME ZONE 'America/Argentina/Buenos_Aires'"
+    )
                 .IsRequired();
 
             entity.Property(p => p.FechaUltimaModificacion)
                 .HasColumnName("fecha_ultima_modificacion")
                 .HasColumnType("timestamp without time zone")
-                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                 .HasDefaultValueSql(
+        "CURRENT_TIMESTAMP AT TIME ZONE 'America/Argentina/Buenos_Aires'"
+    )
                 .IsRequired();
 
 
@@ -218,8 +229,12 @@ public class BelifeDbContext : DbContext
             entity.Property(h => h.Fecha)
                 .HasColumnName("fecha")
                 .HasColumnType("timestamp without time zone")
-                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                 .HasDefaultValueSql(
+        "CURRENT_TIMESTAMP AT TIME ZONE 'America/Argentina/Buenos_Aires'"
+    )
                 .IsRequired();
+
+
 
             entity.Property(h => h.AdministradorId)
                 .HasColumnName("administrador_id")
@@ -273,8 +288,12 @@ public class BelifeDbContext : DbContext
             entity.Property(v => v.FechaHora)
                 .HasColumnName("fecha_hora")
                 .HasColumnType("timestamp without time zone")
-                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                 .HasDefaultValueSql(
+        "CURRENT_TIMESTAMP AT TIME ZONE 'America/Argentina/Buenos_Aires'"
+    )
                 .IsRequired();
+
+
 
             entity.HasIndex(v => v.FechaHora)
                 .HasDatabaseName("ix_venta_fecha_hora");
@@ -371,7 +390,7 @@ public class BelifeDbContext : DbContext
 
     private void ActualizarFechasProductos()
     {
-        var ahora = DateTime.Now;
+        var ahora = HoraArgentina.Ahora();
 
         foreach (var entry in ChangeTracker.Entries<Producto>())
         {
@@ -386,4 +405,6 @@ public class BelifeDbContext : DbContext
             }
         }
     }
+
+
 }
