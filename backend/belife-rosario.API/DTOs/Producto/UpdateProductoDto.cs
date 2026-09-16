@@ -21,4 +21,6 @@ public class UpdateProductoDto
     public bool Estado { get; set; }
 
     public UnidadMedida UnidadMedida { get; set; }
+
+    public UnidadPrecio? UnidadPrecio { get; set; }
 }

@@ -117,6 +117,10 @@ public class BelifeDbContext : DbContext
                 table.HasCheckConstraint(
                     "ck_producto_stock",
                     "stock >= 0");
+
+                table.HasCheckConstraint(
+                    "ck_producto_unidad_precio",
+                    "unidad_precio IS NULL OR unidad_precio IN ('PorKilo', 'Por100Gramos')");
             });
 
             entity.HasKey(p => p.Id);
@@ -164,6 +168,11 @@ public class BelifeDbContext : DbContext
                 .HasConversion<string>()
                 .HasMaxLength(20)
                 .IsRequired();
+
+            entity.Property(p => p.UnidadPrecio)
+                .HasColumnName("unidad_precio")
+                .HasConversion<string>()
+                .HasMaxLength(20);
 
             entity.Property(p => p.FechaCreacion)
                 .HasColumnName("fecha_creacion")

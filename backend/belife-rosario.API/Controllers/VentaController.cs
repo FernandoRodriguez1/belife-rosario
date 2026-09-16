@@ -156,6 +156,7 @@ public class VentaController : ControllerBase
                 ProductoId = d.ProductoId,
                 ProductoNombre = d.Producto.Nombre,
                 UnidadMedida = d.Producto.UnidadMedida,
+                UnidadPrecio = d.Producto.UnidadPrecio,
                 Cantidad = d.Cantidad,
                 PrecioUnitario = d.PrecioUnitario,
                 Subtotal = d.Subtotal
