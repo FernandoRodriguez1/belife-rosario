@@ -11,13 +11,12 @@ function PriceHistoryModal({ product, history, isLoading = false, error = '', on
   return (
     <div
       className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-gray-900/40 p-4 sm:items-center"
-      onClick={onClose}
     >
       <div
         className="my-8 w-full max-w-lg rounded-3xl bg-white shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
+        <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4 sm:px-6">
           <div className="min-w-0">
             <h2 className="truncate font-display text-xl font-bold text-gray-900">
               Historial de precios
@@ -35,7 +34,7 @@ function PriceHistoryModal({ product, history, isLoading = false, error = '', on
           </button>
         </div>
 
-        <div className="px-6 py-6">
+        <div className="px-5 py-6 sm:px-6">
           {isLoading ? (
             <p className="py-8 text-center text-sm text-gray-500">
               Cargando historial de precios...

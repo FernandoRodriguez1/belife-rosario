@@ -4,6 +4,11 @@ import Button from './Button';
 import { formatCurrency } from '../utils/formatCurrency';
 import { FORMA_PAGO_OPTIONS } from '../utils/formaPago';
 
+const SUFIJOS_STOCK = { Gramos: 'g', Unidad: 'u.' };
+const PER_UNIDAD = { Gramos: 'g', Unidad: 'u' };
+
+const sufijoStock = (unidadMedida) => SUFIJOS_STOCK[unidadMedida] ?? 'u.';
+
 function SaleModal({
   products,
   cart,
@@ -14,12 +19,27 @@ function SaleModal({
   onAddToCart,
   onIncrement,
   onDecrement,
+  onSetQuantity,
   onRemove,
   onConfirm,
   onClose,
 }) {
   const [query, setQuery] = useState('');
   const [formaPago, setFormaPago] = useState(0);
+  const [draftCantidades, setDraftCantidades] = useState({});
+
+  const clearDraft = (itemId) =>
+    setDraftCantidades((prev) => {
+      if (!(itemId in prev)) return prev;
+      const next = { ...prev };
+      delete next[itemId];
+      return next;
+    });
+
+  const commitCantidad = (itemId, value) => {
+    onSetQuantity(itemId, value);
+    clearDraft(itemId);
+  };
 
   const normalizedQuery = query.trim().toLowerCase();
   const results = normalizedQuery
@@ -30,20 +50,19 @@ function SaleModal({
   const cartIds = new Set(cart.map((item) => item.id));
 
   const stepperButtonClass =
-    'flex size-7 items-center justify-center text-gray-500 transition-colors duration-150 hover:bg-brand-50 hover:text-brand-600 disabled:cursor-not-allowed disabled:text-gray-400 disabled:hover:bg-transparent';
+    'flex size-7 items-center justify-center text-gray-500 transition-colors duration-150 hover:bg-gray-100 hover:text-gray-600 disabled:cursor-not-allowed disabled:text-gray-400 disabled:hover:bg-transparent';
   const side = 'rounded-l-full';
   const sideRight = 'rounded-r-full';
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-gray-900/40 p-4 sm:items-center"
-      onClick={onClose}
     >
       <div
         className="my-8 w-full max-w-3xl rounded-3xl bg-white shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
+        <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4 sm:px-6">
           <div>
             <h2 className="font-display text-xl font-bold text-gray-900">
               Nueva Venta
@@ -61,7 +80,7 @@ function SaleModal({
           </button>
         </div>
 
-        <div className="px-6 py-6">
+        <div className="px-5 py-6 sm:px-6">
           <div className="grid gap-6 lg:grid-cols-2">
             <div>
               <h3 className="mb-2 text-sm font-semibold text-gray-900">
@@ -94,15 +113,27 @@ function SaleModal({
                 {results.map((product) => {
                   const inCart = cartIds.has(product.id);
                   const outOfStock = product.stock === 0;
+                  const esInactivo = product.estado === 'inactivo';
                   return (
                     <div
                       key={product.id}
-                      className="flex items-center justify-between gap-3 rounded-xl border border-gray-200 px-3 py-2.5 transition-colors duration-150 hover:border-brand-200"
+                      className={`flex items-center justify-between gap-3 rounded-xl border px-3 py-2.5 transition-colors duration-150 ${
+                        esInactivo
+                          ? 'border-gray-100 bg-gray-50 opacity-60'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
                     >
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-medium text-gray-900">
-                          {product.nombre}
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <p className="truncate text-sm font-medium text-gray-900">
+                            {product.nombre}
+                          </p>
+                          {esInactivo && (
+                            <span className="shrink-0 rounded-full bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-500 ring-1 ring-inset ring-gray-400/20">
+                              Inactivo
+                            </span>
+                          )}
+                        </div>
                         <p className="mt-0.5 text-xs text-gray-500">
                           {formatCurrency(product.precio_actual)} ·{' '}
                           <span
@@ -112,22 +143,25 @@ function SaleModal({
                                 : 'text-gray-500'
                             }
                           >
-                            {product.stock} u. disponibles
+                            {product.stock} {sufijoStock(product.unidad_medida)}{' '}
+                            {esInactivo ? 'en stock' : 'disponibles'}
                           </span>
                         </p>
                       </div>
                       <Button
                         size="sm"
-                        variant={inCart ? 'secondary' : 'primary'}
-                        disabled={inCart || outOfStock}
+                        variant={inCart || esInactivo ? 'secondary' : 'primary'}
+                        disabled={inCart || outOfStock || esInactivo}
                         onClick={() => onAddToCart(product)}
                       >
                         <Plus className="size-3.5" />
                         {inCart
                           ? 'En carrito'
-                          : outOfStock
-                            ? 'Sin stock'
-                            : 'Agregar'}
+                          : esInactivo
+                            ? 'Inactivo'
+                            : outOfStock
+                              ? 'Sin stock'
+                              : 'Agregar'}
                       </Button>
                     </div>
                   );
@@ -168,7 +202,8 @@ function SaleModal({
                             {item.nombre}
                           </p>
                           <p className="mt-0.5 text-xs text-gray-500">
-                            {formatCurrency(item.precio_actual)} c/u
+                            {formatCurrency(item.precio_actual)} c/
+                            {PER_UNIDAD[item.unidad_medida] ?? 'u'}
                           </p>
                         </div>
                         <button
@@ -182,18 +217,42 @@ function SaleModal({
                       <div className="mt-2 flex items-center justify-between">
                         <div className="inline-flex items-center rounded-full border border-gray-300">
                           <button
-                            onClick={() => onDecrement(item.id)}
+                            onClick={() => {
+                              clearDraft(item.id);
+                              onDecrement(item.id);
+                            }}
                             disabled={item.cantidad <= 1}
                             className={`${stepperButtonClass} ${side}`}
                             title="Disminuir cantidad"
                           >
                             <Minus className="size-4" />
                           </button>
-                          <span className="min-w-8 text-center text-sm font-semibold text-gray-900">
-                            {item.cantidad}
-                          </span>
+                          <input
+                            type="number"
+                            min="1"
+                            value={
+                              draftCantidades[item.id] ?? String(item.cantidad)
+                            }
+                            onChange={(e) =>
+                              setDraftCantidades((prev) => ({
+                                ...prev,
+                                [item.id]: e.target.value,
+                              }))
+                            }
+                            onBlur={(e) =>
+                              commitCantidad(item.id, e.target.value)
+                            }
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') e.currentTarget.blur();
+                            }}
+                            aria-label={`Cantidad de ${item.nombre}`}
+                            className="w-12 bg-white text-center text-sm font-semibold text-gray-900 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          />
                           <button
-                            onClick={() => onIncrement(item.id)}
+                            onClick={() => {
+                              clearDraft(item.id);
+                              onIncrement(item.id);
+                            }}
                             className={`${stepperButtonClass} ${sideRight}`}
                             title="Aumentar cantidad"
                           >
@@ -239,7 +298,7 @@ function SaleModal({
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-4 border-t border-gray-100 px-6 py-4">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-t border-gray-100 px-5 py-4 sm:px-6">
           <div>
             <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
               Total de la venta

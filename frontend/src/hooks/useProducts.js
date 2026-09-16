@@ -1,11 +1,17 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { productosService } from '../services/productosService';
 import { filtrarStockBajo } from '../utils/stockAlerts';
+import {
+  guardarStockMinimo,
+  obtenerStockMinimo,
+  eliminarStockMinimo,
+} from '../utils/stockMinimoStorage';
 
-// El backend no expone "stock_minimo" (no existe en el esquema de producto).
-// Se deja en null: los cálculos de stock bajo usan el default (5) y el
-// ProductModal muestra el placeholder al editar.
+// El backend no expone "stock_minimo" (no existe en su esquema). El valor se
+// resuelve desde localStorage (ver utils/stockMinimoStorage.js) con un default
+// según la unidad de medida: 5 si es "Unidad", 500 si es "Gramos".
 function normalizarProducto(p) {
+  const unidadMedida = p.unidadMedida ?? 'Gramos';
   return {
     id: p.id,
     codigo: p.codigo ?? '',
@@ -16,8 +22,11 @@ function normalizarProducto(p) {
     marca_nombre: p.marcaNombre,
     precio_actual: Number(p.precioActual),
     stock: Number(p.stock),
-    stock_minimo: null,
+    stock_minimo: obtenerStockMinimo(p.id, unidadMedida),
     estado: p.estado ? 'activo' : 'inactivo',
+    // unidadMedida viaja como string ("Gramos" | "Unidad"). Los productos
+    // creados antes de este campo se guardaron con el default "Gramos".
+    unidad_medida: unidadMedida,
   };
 }
 
@@ -35,6 +44,8 @@ function normalizarProductoParaBackend(product) {
     precioActual: Number(product.precio_actual),
     stock: Number(product.stock),
     estado: estadoBooleano,
+    // El backend rechaza null: normalizamos a "Unidad" o "Gramos".
+    unidadMedida: product.unidad_medida === 'Unidad' ? 'Unidad' : 'Gramos',
   };
 }
 
@@ -80,7 +91,12 @@ export function useProducts() {
 
   const addProduct = useCallback(
     async (product) => {
-      await productosService.create(normalizarProductoParaBackend(product));
+      const creado = await productosService.create(
+        normalizarProductoParaBackend(product)
+      );
+      // El id real recién se conoce tras el POST exitoso (el backend devuelve
+      // el producto creado con su id); recién ahí persisto el stock mínimo.
+      if (creado?.id) guardarStockMinimo(creado.id, product.stock_minimo);
       await refreshProducts();
     },
     [refreshProducts]
@@ -88,7 +104,11 @@ export function useProducts() {
 
   const updateProduct = useCallback(
     async (product) => {
-      await productosService.update(product.id, normalizarProductoParaBackend(product));
+      await productosService.update(
+        product.id,
+        normalizarProductoParaBackend(product)
+      );
+      guardarStockMinimo(product.id, product.stock_minimo);
       await refreshProducts();
     },
     [refreshProducts]
@@ -97,6 +117,7 @@ export function useProducts() {
   const deleteProduct = useCallback(
     async (id) => {
       await productosService.remove(id);
+      eliminarStockMinimo(id);
       await refreshProducts();
     },
     [refreshProducts]

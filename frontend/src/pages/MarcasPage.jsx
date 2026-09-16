@@ -71,7 +71,7 @@ function MarcasPage() {
       <div className="space-y-6">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h1 className="font-display text-3xl font-bold tracking-tight text-gray-900">
+            <h1 className="font-display text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
               Marcas
             </h1>
             <p className="mt-1 text-sm text-gray-500">
@@ -79,7 +79,7 @@ function MarcasPage() {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <span className="inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1.5 font-display text-sm font-semibold text-brand-700 ring-1 ring-inset ring-brand-600/20">
+            <span className="inline-flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1.5 font-display text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-500/20">
               <Tag className="size-4" />
               {marcas.length} marcas
             </span>

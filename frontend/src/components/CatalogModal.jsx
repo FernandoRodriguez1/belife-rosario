@@ -41,13 +41,12 @@ function CatalogModal({
   return (
     <div
       className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-gray-900/40 p-4 sm:items-center"
-      onClick={onClose}
     >
       <div
         className="my-8 w-full max-w-md rounded-3xl bg-white shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
+        <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4 sm:px-6">
           <div>
             <h2 className="font-display text-xl font-bold text-gray-900">
               {isEditing ? `Editar ${labelSingular}` : `Nueva ${labelSingular}`}
@@ -67,7 +66,7 @@ function CatalogModal({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 px-6 py-6">
+        <form onSubmit={handleSubmit} className="space-y-4 px-5 py-6 sm:px-6">
           <div>
             <label className="mb-1.5 block text-sm font-medium text-gray-700" htmlFor="nombre">
               Nombre <span className="text-red-500">*</span>
@@ -86,9 +85,9 @@ function CatalogModal({
             {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
           </div>
 
-          <div className="flex items-center justify-end gap-3 border-t border-gray-100 pt-5">
+          <div className="flex flex-wrap items-center justify-end gap-3 border-t border-gray-100 pt-5">
             {submitError && (
-              <p className="mr-auto rounded-xl bg-red-50 px-3 py-2 text-xs text-red-600 ring-1 ring-inset ring-red-600/10">
+              <p className="w-full rounded-xl bg-red-50 px-3 py-2 text-xs text-red-600 ring-1 ring-inset ring-red-600/10 sm:mr-auto sm:w-auto">
                 {submitError}
               </p>
             )}

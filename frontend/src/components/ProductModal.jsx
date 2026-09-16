@@ -3,14 +3,21 @@ import { X } from 'lucide-react';
 import Button from './Button';
 import { useCategorias } from '../hooks/useCategorias';
 import { useMarcas } from '../hooks/useMarcas';
+import { obtenerStockMinimoPorUnidad } from '../utils/stockMinimoStorage';
 
 const ESTADOS = ['activo', 'inactivo'];
+const UNIDADES = [
+  { value: 'Unidad', label: 'Unidad (u.)' },
+  { value: 'Gramos', label: 'Gramos (g)' },
+];
 
 const validarNombre = (value) =>
   !value.trim() ? 'El nombre es obligatorio.' : '';
 const validarCategoria = (value) =>
   !value ? 'La categoría es obligatoria.' : '';
 const validarMarca = (value) => (!value ? 'La marca es obligatoria.' : '');
+const validarUnidadMedida = (value) =>
+  !value ? 'La unidad de medida es obligatoria.' : '';
 const validarPrecio = (value) => {
   if (!value) return 'El precio es obligatorio.';
   return Number(value) <= 0 ? 'El precio debe ser mayor a 0.' : '';
@@ -37,8 +44,12 @@ function ProductModal({ product = null, products = [], onClose, onSave, submitEr
           marca_id: product.marca_id ?? '',
           precio_actual: String(product.precio_actual),
           stock: String(product.stock),
+          // Al editar, muestro el valor persistido (ya resuelto desde
+          // localStorage en el producto normalizado) o el default.
           stock_minimo: String(product.stock_minimo ?? 5),
           estado: product.estado ?? 'activo',
+          // default "Unidad": en un almacén/dietética la mayoría se vende por unidad.
+          unidad_medida: product.unidad_medida ?? 'Unidad',
         }
       : {
           codigo: '',
@@ -47,15 +58,33 @@ function ProductModal({ product = null, products = [], onClose, onSave, submitEr
           marca_id: '',
           precio_actual: '',
           stock: '',
-          stock_minimo: '5',
+          // Al crear, default según la unidad de medida seleccionada al abrir.
+          stock_minimo: String(obtenerStockMinimoPorUnidad('Unidad')),
           estado: 'activo',
+          unidad_medida: 'Unidad',
         }
   );
   const [errors, setErrors] = useState({});
+  // En edición el valor persistido no debe pisarse si cambia la unidad.
+  // En creación: solo se auto-completa el default si el usuario todavía no
+  // tocó el campo Stock Mínimo (sobreescribible en cualquier momento).
+  const [stockMinimoTocado, setStockMinimoTocado] = useState(isEditing);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+
+    if (name === 'stock_minimo') {
+      setStockMinimoTocado(true);
+      return;
+    }
+
+    if (name === 'unidad_medida' && !stockMinimoTocado) {
+      setForm((prev) => ({
+        ...prev,
+        stock_minimo: String(obtenerStockMinimoPorUnidad(value)),
+      }));
+    }
   };
 
   const validarCodigo = (value) => {
@@ -80,6 +109,7 @@ function ProductModal({ product = null, products = [], onClose, onSave, submitEr
       precio_actual: validarPrecio(form.precio_actual),
       stock: validarStock(form.stock),
       stock_minimo: validarStockMinimo(form.stock_minimo),
+      unidad_medida: validarUnidadMedida(form.unidad_medida),
     };
     return Object.fromEntries(
       Object.entries(nextErrors).filter(([, message]) => message)
@@ -102,6 +132,7 @@ function ProductModal({ product = null, products = [], onClose, onSave, submitEr
       stock: Number(form.stock),
       stock_minimo: Number(form.stock_minimo),
       estado: form.estado,
+      unidad_medida: form.unidad_medida,
     };
 
     onSave(isEditing ? { ...payload, id: product.id } : payload);
@@ -119,13 +150,12 @@ function ProductModal({ product = null, products = [], onClose, onSave, submitEr
   return (
     <div
       className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-gray-900/40 p-4 sm:items-center"
-      onClick={onClose}
     >
       <div
         className="my-8 w-full max-w-lg rounded-3xl bg-white shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
+        <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4 sm:px-6">
           <div>
             <h2 className="font-display text-xl font-bold text-gray-900">
               {isEditing ? 'Editar Producto' : 'Nuevo Producto'}
@@ -145,7 +175,7 @@ function ProductModal({ product = null, products = [], onClose, onSave, submitEr
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 px-6 py-6">
+        <form onSubmit={handleSubmit} className="space-y-4 px-5 py-6 sm:px-6">
           <div>
             <label className={labelClass} htmlFor="codigo">
               Código
@@ -203,6 +233,30 @@ function ProductModal({ product = null, products = [], onClose, onSave, submitEr
             {errors.categoria_id && (
               <p className="mt-1 text-xs text-red-600">
                 {errors.categoria_id}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className={labelClass} htmlFor="unidad_medida">
+              Unidad de Medida <span className="text-red-500">*</span>
+            </label>
+            <select
+              id="unidad_medida"
+              name="unidad_medida"
+              value={form.unidad_medida}
+              onChange={handleChange}
+              className={`${fieldClass(Boolean(errors.unidad_medida))} cursor-pointer`}
+            >
+              {UNIDADES.map(({ value, label }) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+            {errors.unidad_medida && (
+              <p className="mt-1 text-xs text-red-600">
+                {errors.unidad_medida}
               </p>
             )}
           </div>
@@ -314,9 +368,9 @@ function ProductModal({ product = null, products = [], onClose, onSave, submitEr
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-3 border-t border-gray-100 pt-5">
+          <div className="flex flex-wrap items-center justify-end gap-3 border-t border-gray-100 pt-5">
             {submitError && (
-              <p className="mr-auto rounded-xl bg-red-50 px-3 py-2 text-xs text-red-600 ring-1 ring-inset ring-red-600/10">
+              <p className="w-full rounded-xl bg-red-50 px-3 py-2 text-xs text-red-600 ring-1 ring-inset ring-red-600/10 sm:mr-auto sm:w-auto">
                 {submitError}
               </p>
             )}

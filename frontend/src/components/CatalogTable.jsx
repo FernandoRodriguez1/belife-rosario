@@ -11,7 +11,7 @@ function CatalogTable({
 }) {
   if (items.length === 0) {
     return (
-      <div className="rounded-2xl border border-gray-200 border-t-2 border-t-brand-500 bg-white p-12 text-center shadow-sm">
+      <div className="rounded-2xl border border-gray-200 border-t-2 border-t-gray-300 bg-white p-12 text-center shadow-sm">
         <p className="text-sm font-medium text-gray-900">No hay elementos</p>
         <p className="mt-1 text-sm text-gray-500">{emptyMessage}</p>
       </div>
@@ -19,18 +19,18 @@ function CatalogTable({
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-gray-200 border-t-2 border-t-brand-500 bg-white shadow-sm">
+    <div className="overflow-hidden rounded-2xl border border-gray-200 border-t-2 border-t-gray-300 bg-white shadow-sm">
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+              <th className="px-4 py-3 sm:px-6 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                 Nombre
               </th>
-              <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+              <th className="px-4 py-3 sm:px-6 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                 {productLabel}
               </th>
-              <th className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wide text-gray-500">
+              <th className="px-4 py-3 sm:px-6 text-right text-xs font-semibold uppercase tracking-wide text-gray-500">
                 Acciones
               </th>
             </tr>
@@ -41,28 +41,28 @@ function CatalogTable({
                 key={item.id}
                 className="transition-colors duration-150 hover:bg-gray-50"
               >
-                <td className="px-6 py-4">
+                <td className="px-4 py-4 sm:px-6">
                   <div className="flex items-center gap-4">
-                    <div className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-brand-50">
-                      <Icon className="size-5 text-brand-600" />
+                    <div className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-gray-100">
+                      <Icon className="size-5 text-gray-600" />
                     </div>
                     <p className="truncate text-sm font-medium text-gray-900">
                       {item.nombre}
                     </p>
                   </div>
                 </td>
-                <td className="whitespace-nowrap px-6 py-4">
+                <td className="whitespace-nowrap px-4 py-4 sm:px-6">
                   <Badge category={item.nombre}>
                     {item.cantidadProductos}{' '}
                     {item.cantidadProductos === 1 ? 'producto' : 'productos'}
                   </Badge>
                 </td>
-                <td className="whitespace-nowrap px-6 py-4">
+                <td className="whitespace-nowrap px-4 py-4 sm:px-6">
                   <div className="flex items-center justify-end gap-1">
                     <button
                       onClick={() => onEdit(item)}
                       title="Editar"
-                      className="rounded-lg p-2 text-gray-400 transition-colors duration-150 hover:bg-brand-50 hover:text-brand-600"
+                      className="rounded-lg p-2 text-gray-400 transition-colors duration-150 hover:bg-gray-100 hover:text-gray-600"
                     >
                       <Pencil className="size-4" />
                     </button>

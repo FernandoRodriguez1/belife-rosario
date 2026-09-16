@@ -13,13 +13,12 @@ function SalesHistoryModal({ ventas, isLoading = false, error = '', onClose }) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-gray-900/40 p-4 sm:items-center"
-      onClick={onClose}
     >
       <div
         className="my-8 w-full max-w-2xl rounded-3xl bg-white shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
+        <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4 sm:px-6">
           <div>
             <h2 className="font-display text-xl font-bold text-gray-900">
               Historial de Ventas
@@ -37,7 +36,7 @@ function SalesHistoryModal({ ventas, isLoading = false, error = '', onClose }) {
           </button>
         </div>
 
-        <div className="px-6 py-6">
+        <div className="px-5 py-6 sm:px-6">
           {isLoading ? (
             <p className="py-8 text-center text-sm text-gray-500">
               Cargando ventas...
@@ -84,20 +83,20 @@ function SalesHistoryModal({ ventas, isLoading = false, error = '', onClose }) {
 
                     {isExpanded && (
                       <div className="px-2 pb-3 pt-1">
-                        <div className="overflow-hidden rounded-xl border border-gray-200">
+                        <div className="overflow-x-auto rounded-xl border border-gray-200">
                           <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                               <tr>
-                                <th className="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 sm:px-4">
                                   Producto
                                 </th>
-                                <th className="px-4 py-2 text-right text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                <th className="px-3 py-2 text-right text-xs font-semibold uppercase tracking-wide text-gray-500 sm:px-4">
                                   Cant.
                                 </th>
-                                <th className="px-4 py-2 text-right text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                <th className="px-3 py-2 text-right text-xs font-semibold uppercase tracking-wide text-gray-500 sm:px-4">
                                   Precio
                                 </th>
-                                <th className="px-4 py-2 text-right text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                <th className="px-3 py-2 text-right text-xs font-semibold uppercase tracking-wide text-gray-500 sm:px-4">
                                   Subtotal
                                 </th>
                               </tr>
@@ -105,16 +104,16 @@ function SalesHistoryModal({ ventas, isLoading = false, error = '', onClose }) {
                             <tbody className="divide-y divide-gray-100">
                               {venta.items.map((item) => (
                                 <tr key={item.producto_id}>
-                                  <td className="px-4 py-2.5 text-sm text-gray-900">
+                                  <td className="px-3 py-2.5 text-sm text-gray-900 sm:px-4">
                                     {item.nombre}
                                   </td>
-                                  <td className="px-4 py-2.5 text-right text-sm text-gray-500">
+                                  <td className="px-3 py-2.5 text-right text-sm text-gray-500 sm:px-4">
                                     {item.cantidad}
                                   </td>
-                                  <td className="px-4 py-2.5 text-right text-sm text-gray-500">
+                                  <td className="px-3 py-2.5 text-right whitespace-nowrap text-sm text-gray-500 sm:px-4">
                                     {formatCurrency(item.precio_unitario)}
                                   </td>
-                                  <td className="px-4 py-2.5 text-right font-display text-sm font-semibold text-gray-900">
+                                  <td className="px-3 py-2.5 text-right whitespace-nowrap font-display text-sm font-semibold text-gray-900 sm:px-4">
                                     {formatCurrency(item.subtotal)}
                                   </td>
                                 </tr>
@@ -122,11 +121,11 @@ function SalesHistoryModal({ ventas, isLoading = false, error = '', onClose }) {
                               <tr className="bg-gray-50">
                                 <td
                                   colSpan="3"
-                                  className="px-4 py-2.5 text-right text-sm font-medium text-gray-500"
+                                  className="px-3 py-2.5 text-right text-sm font-medium text-gray-500 sm:px-4"
                                 >
                                   Total
                                 </td>
-                                <td className="px-4 py-2.5 text-right font-display text-sm font-bold text-gray-900">
+                                <td className="px-3 py-2.5 text-right whitespace-nowrap font-display text-sm font-bold text-gray-900 sm:px-4">
                                   {formatCurrency(venta.total)}
                                 </td>
                               </tr>

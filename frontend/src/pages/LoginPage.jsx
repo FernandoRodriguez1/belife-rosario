@@ -50,7 +50,7 @@ function LoginPage() {
     }`;
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center p-4">
+    <div className="relative flex min-h-screen items-center justify-center px-4 py-6 sm:p-8">
       <div className="fixed inset-0 z-0 bg-brand-500">
         <div
           className="absolute inset-0 bg-cover bg-center opacity-85"
@@ -58,15 +58,15 @@ function LoginPage() {
         />
       </div>
 
-      <div className="relative z-10 w-full max-w-md rounded-3xl bg-white p-8 shadow-xl sm:p-10">
+      <div className="relative z-10 w-full max-w-md rounded-3xl bg-white px-6 py-8 shadow-xl sm:p-10">
         <div className="mb-8 flex flex-col items-center gap-4 text-center">
           <img
             src={logo}
             alt="Logo Belife Rosario"
-            className="h-20 w-auto object-contain"
+            className="h-16 w-auto object-contain sm:h-20"
           />
           <div>
-            <h1 className="font-display text-2xl font-bold text-gray-900">
+            <h1 className="font-display text-xl font-bold text-gray-900 sm:text-2xl">
               Belife Rosario
             </h1>
             <p className="mt-1 text-sm text-gray-500">

@@ -11,6 +11,7 @@ function normalizarDetalle(d) {
   return {
     producto_id: d.productoId,
     nombre: d.productoNombre,
+    unidad_medida: d.unidadMedida ?? null,
     cantidad: d.cantidad,
     precio_unitario: Number(d.precioUnitario),
     subtotal: Number(d.subtotal),
@@ -158,6 +159,52 @@ export function useSales(products, refreshProducts) {
     [cart]
   );
 
+  // Permite setear la cantidad directamente (input editable del carrito).
+  // Valida contra el stock disponible y la cota mínima (1): si llega a 0 o a
+  // un valor inválido vacío, el ítem se quita del carrito para no dejar un
+  // valor inconsistente.
+  const setQuantity = useCallback(
+    (productId, cantidad) => {
+      const item = cart.find((i) => i.id === productId);
+      if (!item) return;
+
+      const numero = Number(cantidad);
+      if (!Number.isFinite(numero)) {
+        setCartError(
+          `La cantidad de "${item.nombre}" debe ser un número válido.`
+        );
+        return;
+      }
+
+      if (numero < 1) {
+        setCartError('');
+        setCart(cart.filter((i) => i.id !== productId));
+        return;
+      }
+
+      if (!hayStockDisponible(item.stock, numero)) {
+        setCartError(
+          `Stock insuficiente de "${item.nombre}": máximo ${item.stock} unidades.`
+        );
+        return;
+      }
+
+      setCartError('');
+      setCart(
+        cart.map((i) =>
+          i.id === productId
+            ? {
+                ...i,
+                cantidad: numero,
+                subtotal: calcularSubtotal(i.precio_actual, numero),
+              }
+            : i
+        )
+      );
+    },
+    [cart]
+  );
+
   const removeFromCart = useCallback(
     (productId) => {
       setCartError('');
@@ -231,6 +278,7 @@ export function useSales(products, refreshProducts) {
     addToCart,
     incrementQuantity,
     decrementQuantity,
+    setQuantity,
     removeFromCart,
     clearCart,
     confirmSale,
