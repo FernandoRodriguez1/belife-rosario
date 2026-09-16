@@ -2,11 +2,6 @@ import { AlertTriangle, History, Package, Pencil, Trash2 } from 'lucide-react';
 import Badge from './Badge';
 import { formatCurrency } from '../utils/formatCurrency';
 import { esStockBajo } from '../utils/stockAlerts';
-import { categorias } from '../data/categorias';
-
-const categoriaLookup = new Map(
-  categorias.map((cat) => [cat.id, cat.nombre])
-);
 
 const estadoIndicator = (estado) =>
   estado === 'activo'
@@ -54,7 +49,7 @@ function ProductTable({ products, onEdit, onDelete, onHistory }) {
           <tbody className="divide-y divide-gray-100">
             {products.map((product) => {
               const categoria =
-                categoriaLookup.get(product.categoria_id) ?? 'Sin categoría';
+                product.categoria_nombre ?? 'Sin categoría';
               const estado = estadoIndicator(product.estado);
               const lowStock = esStockBajo(product);
               return (

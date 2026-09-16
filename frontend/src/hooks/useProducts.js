@@ -1,37 +1,106 @@
-import { useState, useMemo, useCallback } from 'react';
-import { initialProducts } from '../data/products';
+import { useState, useMemo, useCallback, useEffect } from 'react';
+import { productosService } from '../services/productosService';
 import { filtrarStockBajo } from '../utils/stockAlerts';
 
+// El backend no expone "stock_minimo" (no existe en el esquema de producto).
+// Se deja en null: los cálculos de stock bajo usan el default (5) y el
+// ProductModal muestra el placeholder al editar.
+function normalizarProducto(p) {
+  return {
+    id: p.id,
+    codigo: p.codigo ?? '',
+    nombre: p.nombre,
+    categoria_id: p.categoriaId,
+    categoria_nombre: p.categoriaNombre,
+    marca_id: p.marcaId,
+    marca_nombre: p.marcaNombre,
+    precio_actual: Number(p.precioActual),
+    stock: Number(p.stock),
+    stock_minimo: null,
+    estado: p.estado ? 'activo' : 'inactivo',
+  };
+}
+
+function normalizarProductoParaBackend(product) {
+  const estadoBooleano =
+    typeof product.estado === 'boolean'
+      ? product.estado
+      : product.estado === 'activo';
+
+  return {
+    codigo: product.codigo ?? null,
+    nombre: product.nombre,
+    categoriaId: Number(product.categoria_id),
+    marcaId: Number(product.marca_id),
+    precioActual: Number(product.precio_actual),
+    stock: Number(product.stock),
+    estado: estadoBooleano,
+  };
+}
+
 export function useProducts() {
-  const [products, setProducts] = useState(initialProducts);
+  const [products, setProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
   const [query, setQuery] = useState('');
   const [sortBy, setSortBy] = useState('name');
   const [onlyLowStock, setOnlyLowStock] = useState(false);
 
-  const addProduct = useCallback((product) => {
-    setProducts((prev) => [
-      ...prev,
-      { ...product, id: Math.max(0, ...prev.map((p) => p.id)) + 1 },
-    ]);
+  const refreshProducts = useCallback(async () => {
+    try {
+      const data = await productosService.getAll();
+      setProducts(data.map(normalizarProducto));
+      setError('');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  const updateProduct = useCallback((product) => {
-    setProducts((prev) =>
-      prev.map((p) => (p.id === product.id ? product : p))
-    );
+  useEffect(() => {
+    let active = true;
+    productosService
+      .getAll()
+      .then((data) => {
+        if (!active) return;
+        setProducts(data.map(normalizarProducto));
+        setError('');
+      })
+      .catch((err) => {
+        if (active) setError(err.message);
+      })
+      .finally(() => {
+        if (active) setIsLoading(false);
+      });
+    return () => {
+      active = false;
+    };
   }, []);
 
-  const deleteProduct = useCallback((id) => {
-    setProducts((prev) => prev.filter((p) => p.id !== id));
-  }, []);
+  const addProduct = useCallback(
+    async (product) => {
+      await productosService.create(normalizarProductoParaBackend(product));
+      await refreshProducts();
+    },
+    [refreshProducts]
+  );
 
-  const deductStock = useCallback((id, quantity) => {
-    setProducts((prev) =>
-      prev.map((p) =>
-        p.id === id ? { ...p, stock: Math.max(0, p.stock - quantity) } : p
-      )
-    );
-  }, []);
+  const updateProduct = useCallback(
+    async (product) => {
+      await productosService.update(product.id, normalizarProductoParaBackend(product));
+      await refreshProducts();
+    },
+    [refreshProducts]
+  );
+
+  const deleteProduct = useCallback(
+    async (id) => {
+      await productosService.remove(id);
+      await refreshProducts();
+    },
+    [refreshProducts]
+  );
 
   const totalProducts = products.length;
   const totalStock = products.reduce((sum, p) => sum + p.stock, 0);
@@ -72,10 +141,12 @@ export function useProducts() {
     totalProducts,
     totalStock,
     inventoryValue,
+    isLoading,
+    error,
+    refreshProducts,
     addProduct,
     updateProduct,
     deleteProduct,
-    deductStock,
     query,
     setQuery,
     sortBy,
@@ -84,3 +155,5 @@ export function useProducts() {
     setOnlyLowStock,
   };
 }
+
+export default useProducts;

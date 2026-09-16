@@ -1,7 +1,13 @@
-import { LogOut } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { LayoutGrid, LogOut, Tag, Tags } from 'lucide-react';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import logo from '../assets/logo.png';
+
+const NAV_LINKS = [
+  { to: '/dashboard', label: 'Productos', icon: LayoutGrid },
+  { to: '/categorias', label: 'Categorías', icon: Tags },
+  { to: '/marcas', label: 'Marcas', icon: Tag },
+];
 
 function Header() {
   const { currentUser, logout } = useAuth();
@@ -26,7 +32,7 @@ function Header() {
               Belife Rosario
             </p>
             <p className="text-xs font-medium text-brand-600">
-              Panel Admin · Gestión de Productos
+              Panel Admin · Gestión
             </p>
           </div>
         </div>
@@ -42,6 +48,26 @@ function Header() {
             Cerrar sesión
           </button>
         </div>
+      </div>
+
+      <div className="mx-auto flex max-w-7xl items-center gap-1 px-4 pb-4 sm:px-6 lg:px-8">
+        {NAV_LINKS.map(({ to, label, icon: Icon }) => (
+          <NavLink
+            key={to}
+            to={to}
+            end
+            className={({ isActive }) =>
+              `inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors duration-150 ${
+                isActive
+                  ? 'bg-brand-600 text-white shadow-sm'
+                  : 'text-brand-700 hover:bg-brand-50'
+              }`
+            }
+          >
+            <Icon className="size-4" />
+            {label}
+          </NavLink>
+        ))}
       </div>
     </header>
   );

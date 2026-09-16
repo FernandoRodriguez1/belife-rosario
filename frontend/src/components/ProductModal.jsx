@@ -1,13 +1,33 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
 import Button from './Button';
-import { categorias } from '../data/categorias';
-import { marcas } from '../data/marcas';
+import { useCategorias } from '../hooks/useCategorias';
+import { useMarcas } from '../hooks/useMarcas';
 
 const ESTADOS = ['activo', 'inactivo'];
 
-function ProductModal({ product = null, onClose, onSave }) {
+const validarNombre = (value) =>
+  !value.trim() ? 'El nombre es obligatorio.' : '';
+const validarCategoria = (value) =>
+  !value ? 'La categoría es obligatoria.' : '';
+const validarMarca = (value) => (!value ? 'La marca es obligatoria.' : '');
+const validarPrecio = (value) => {
+  if (!value) return 'El precio es obligatorio.';
+  return Number(value) <= 0 ? 'El precio debe ser mayor a 0.' : '';
+};
+const validarStock = (value) => {
+  if (!value) return 'El stock es obligatorio.';
+  return Number(value) < 0 ? 'El stock no puede ser negativo.' : '';
+};
+const validarStockMinimo = (value) => {
+  if (!value) return 'El stock mínimo es obligatorio.';
+  return Number(value) < 0 ? 'El stock mínimo no puede ser negativo.' : '';
+};
+
+function ProductModal({ product = null, products = [], onClose, onSave, submitError = '' }) {
   const isEditing = Boolean(product);
+  const { categorias } = useCategorias();
+  const { marcas } = useMarcas();
   const [form, setForm] = useState(() =>
     product
       ? {
@@ -38,31 +58,32 @@ function ProductModal({ product = null, onClose, onSave }) {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  const validarCodigo = (value) => {
+    const codigo = value.trim();
+    if (!codigo) return '';
+
+    const duplicado = products.some(
+      (p) =>
+        p.id !== product?.id &&
+        p.codigo &&
+        p.codigo.trim().toLowerCase() === codigo.toLowerCase()
+    );
+    return duplicado ? 'Ya existe un producto con ese código.' : '';
+  };
+
   const validate = () => {
-    const nextErrors = {};
-
-    if (!form.codigo.trim()) nextErrors.codigo = 'El código es obligatorio.';
-    if (!form.nombre.trim()) nextErrors.nombre = 'El nombre es obligatorio.';
-    if (!form.categoria_id) {
-      nextErrors.categoria_id = 'La categoría es obligatoria.';
-    }
-    if (!form.precio_actual) {
-      nextErrors.precio_actual = 'El precio es obligatorio.';
-    } else if (Number(form.precio_actual) <= 0) {
-      nextErrors.precio_actual = 'El precio debe ser mayor a 0.';
-    }
-    if (!form.stock) {
-      nextErrors.stock = 'El stock es obligatorio.';
-    } else if (Number(form.stock) < 0) {
-      nextErrors.stock = 'El stock no puede ser negativo.';
-    }
-    if (!form.stock_minimo) {
-      nextErrors.stock_minimo = 'El stock mínimo es obligatorio.';
-    } else if (Number(form.stock_minimo) < 0) {
-      nextErrors.stock_minimo = 'El stock mínimo no puede ser negativo.';
-    }
-
-    return nextErrors;
+    const nextErrors = {
+      codigo: validarCodigo(form.codigo),
+      nombre: validarNombre(form.nombre),
+      categoria_id: validarCategoria(form.categoria_id),
+      marca_id: validarMarca(form.marca_id),
+      precio_actual: validarPrecio(form.precio_actual),
+      stock: validarStock(form.stock),
+      stock_minimo: validarStockMinimo(form.stock_minimo),
+    };
+    return Object.fromEntries(
+      Object.entries(nextErrors).filter(([, message]) => message)
+    );
   };
 
   const handleSubmit = (e) => {
@@ -73,7 +94,7 @@ function ProductModal({ product = null, onClose, onSave }) {
     if (Object.keys(nextErrors).length > 0) return;
 
     const payload = {
-      codigo: form.codigo.trim(),
+      codigo: form.codigo.trim() || null,
       nombre: form.nombre.trim(),
       categoria_id: form.categoria_id ? Number(form.categoria_id) : null,
       marca_id: form.marca_id ? Number(form.marca_id) : null,
@@ -127,7 +148,7 @@ function ProductModal({ product = null, onClose, onSave }) {
         <form onSubmit={handleSubmit} className="space-y-4 px-6 py-6">
           <div>
             <label className={labelClass} htmlFor="codigo">
-              Código <span className="text-red-500">*</span>
+              Código
             </label>
             <input
               id="codigo"
@@ -189,14 +210,14 @@ function ProductModal({ product = null, onClose, onSave }) {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className={labelClass} htmlFor="marca_id">
-                Marca
+                Marca <span className="text-red-500">*</span>
               </label>
               <select
                 id="marca_id"
                 name="marca_id"
                 value={form.marca_id}
                 onChange={handleChange}
-                className={`${fieldClass(false)} cursor-pointer`}
+                className={`${fieldClass(Boolean(errors.marca_id))} cursor-pointer`}
               >
                 <option value="">Seleccioná una marca...</option>
                 {marcas.map((marca) => (
@@ -205,6 +226,9 @@ function ProductModal({ product = null, onClose, onSave }) {
                   </option>
                 ))}
               </select>
+              {errors.marca_id && (
+                <p className="mt-1 text-xs text-red-600">{errors.marca_id}</p>
+              )}
             </div>
             <div>
               <label className={labelClass} htmlFor="estado">
@@ -291,6 +315,11 @@ function ProductModal({ product = null, onClose, onSave }) {
           </div>
 
           <div className="flex items-center justify-end gap-3 border-t border-gray-100 pt-5">
+            {submitError && (
+              <p className="mr-auto rounded-xl bg-red-50 px-3 py-2 text-xs text-red-600 ring-1 ring-inset ring-red-600/10">
+                {submitError}
+              </p>
+            )}
             <Button type="button" variant="secondary" onClick={onClose}>
               Cancelar
             </Button>

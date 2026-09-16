@@ -1,10 +1,5 @@
 import { X } from 'lucide-react';
 import { formatCurrency } from '../utils/formatCurrency';
-import { administradores } from '../data/administradores';
-
-const adminLookup = new Map(
-  administradores.map((admin) => [admin.id, admin.nombre])
-);
 
 const formatFecha = (iso) => {
   const date = new Date(iso);
@@ -12,7 +7,7 @@ const formatFecha = (iso) => {
   return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
 };
 
-function PriceHistoryModal({ product, history, onClose }) {
+function PriceHistoryModal({ product, history, isLoading = false, error = '', onClose }) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-gray-900/40 p-4 sm:items-center"
@@ -41,15 +36,22 @@ function PriceHistoryModal({ product, history, onClose }) {
         </div>
 
         <div className="px-6 py-6">
-          {history.length === 0 ? (
+          {isLoading ? (
+            <p className="py-8 text-center text-sm text-gray-500">
+              Cargando historial de precios...
+            </p>
+          ) : error ? (
+            <p className="rounded-xl bg-red-50 px-4 py-2.5 text-sm text-red-600 ring-1 ring-inset ring-red-600/10">
+              {error}
+            </p>
+          ) : history.length === 0 ? (
             <p className="py-8 text-center text-sm text-gray-500">
               Este producto no tiene cambios de precio registrados.
             </p>
           ) : (
             <ul className="divide-y divide-gray-100">
               {history.map((entry) => {
-                const admin =
-                  adminLookup.get(entry.administrador_id) ?? 'Administrador';
+                const admin = entry.administrador_nombre ?? 'Administrador';
                 const isIncrease = entry.precio_nuevo > entry.precio_anterior;
                 return (
                   <li key={entry.id} className="py-3">

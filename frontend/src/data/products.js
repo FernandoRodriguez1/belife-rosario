@@ -1,3 +1,7 @@
+// OBSOLETO: este archivo quedó sin uso tras la integración con la API real
+// (src/services/productosService.js + hooks/useProducts.js). Se puede eliminar
+// una vez confirmado que la integración funciona correctamente.
+//
 // TODO backend: el campo "stock_minimo" todavía no existe en el esquema real
 // (tabla PRODUCTO). Confirmar con el equipo de backend que lo agreguen.
 export const initialProducts = [

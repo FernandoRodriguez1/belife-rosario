@@ -1,3 +1,6 @@
+// OBSOLETO: quedó sin uso tras la integración con la API real
+// (src/services/categoriasService.js + hooks/useCategorias.js). Se puede
+// eliminar una vez confirmado que la integración funciona.
 export const categorias = [
   { id: 1, nombre: 'Aceites' },
   { id: 2, nombre: 'Cacao' },

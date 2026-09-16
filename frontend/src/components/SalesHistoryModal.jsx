@@ -2,13 +2,9 @@ import { useState } from 'react';
 import { ChevronDown, ChevronRight, X } from 'lucide-react';
 import { formatCurrency } from '../utils/formatCurrency';
 import { formatFecha } from '../utils/formatFecha';
-import { administradores } from '../data/administradores';
+import { labelFormaPago } from '../utils/formaPago';
 
-const adminLookup = new Map(
-  administradores.map((admin) => [admin.id, admin.nombre])
-);
-
-function SalesHistoryModal({ ventas, onClose }) {
+function SalesHistoryModal({ ventas, isLoading = false, error = '', onClose }) {
   const [expandedId, setExpandedId] = useState(null);
 
   const toggleExpand = (id) =>
@@ -42,15 +38,24 @@ function SalesHistoryModal({ ventas, onClose }) {
         </div>
 
         <div className="px-6 py-6">
-          {ventas.length === 0 ? (
+          {isLoading ? (
+            <p className="py-8 text-center text-sm text-gray-500">
+              Cargando ventas...
+            </p>
+          ) : error ? (
+            <p className="rounded-xl bg-red-50 px-4 py-2.5 text-sm text-red-600 ring-1 ring-inset ring-red-600/10">
+              {error}
+            </p>
+          ) : ventas.length === 0 ? (
             <p className="py-8 text-center text-sm text-gray-500">
               Todavía no hay ventas registradas.
             </p>
           ) : (
             <ul className="divide-y divide-gray-100">
               {ventas.map((venta) => {
-                const admin =
-                  adminLookup.get(venta.administrador_id) ?? 'Administrador';
+                // El backend de ventas no expone el administrador; el nombre
+                // llega en venta.administrador_nombre solo si se agrega luego.
+                const admin = venta.administrador_nombre ?? 'Administrador';
                 const isExpanded = expandedId === venta.id;
                 return (
                   <li key={venta.id} className="py-2">
@@ -63,7 +68,8 @@ function SalesHistoryModal({ ventas, onClose }) {
                           {formatFecha(venta.fecha)}
                         </p>
                         <p className="mt-0.5 truncate text-xs text-gray-500">
-                          {admin} · {venta.cantidad_items} productos
+                          {admin} · {venta.cantidad_items} productos ·{' '}
+                          {labelFormaPago(venta.forma_pago)}
                         </p>
                       </div>
                       <span className="ml-auto font-display text-sm font-semibold text-gray-900">

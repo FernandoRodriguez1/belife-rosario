@@ -1,3 +1,6 @@
+// OBSOLETO: quedó sin uso tras la integración con la API real
+// (src/services/historialPreciosService.js + hooks/usePriceHistory.js). Se
+// puede eliminar una vez confirmado que la integración funciona.
 export const initialHistorial = [
   {
     id: 1,

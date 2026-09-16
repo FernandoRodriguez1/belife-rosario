@@ -1,6 +1,5 @@
-import { useState, useCallback, useMemo } from 'react';
-import { initialVentas } from '../data/ventas';
-import { useAuth } from './useAuth';
+import { useState, useCallback, useMemo, useEffect } from 'react';
+import { ventasService } from '../services/ventasService';
 import {
   calcularSubtotal,
   calcularTotalCarrito,
@@ -8,11 +7,69 @@ import {
   hayStockDisponible,
 } from '../utils/saleCalculations';
 
-export function useSales(products, deductStock) {
-  const { currentUser } = useAuth();
+function normalizarDetalle(d) {
+  return {
+    producto_id: d.productoId,
+    nombre: d.productoNombre,
+    cantidad: d.cantidad,
+    precio_unitario: Number(d.precioUnitario),
+    subtotal: Number(d.subtotal),
+  };
+}
+
+function normalizarVenta(v) {
+  const detalles = v.detalles ?? [];
+  return {
+    id: v.id,
+    total: Number(v.monto),
+    forma_pago: v.formaPago ?? null,
+    fecha: v.fechaHora,
+    cantidad_items:
+      v.cantidadDetalles ??
+      detalles.reduce((sum, d) => sum + (d.cantidad ?? 0), 0),
+    items: detalles.map(normalizarDetalle),
+  };
+}
+
+export function useSales(products, refreshProducts) {
   const [cart, setCart] = useState([]);
-  const [ventas, setVentas] = useState(initialVentas);
+  const [ventas, setVentas] = useState([]);
   const [cartError, setCartError] = useState('');
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  const refreshVentas = useCallback(async () => {
+    try {
+      const data = await ventasService.getAll();
+      setVentas(data.map(normalizarVenta));
+      setError('');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    ventasService
+      .getAll()
+      .then((data) => {
+        if (!active) return;
+        setVentas(data.map(normalizarVenta));
+        setError('');
+      })
+      .catch((err) => {
+        if (active) setError(err.message);
+      })
+      .finally(() => {
+        if (active) setIsLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const addToCart = useCallback(
     (product) => {
@@ -114,56 +171,52 @@ export function useSales(products, deductStock) {
     setCartError('');
   }, []);
 
-  const confirmSale = useCallback(() => {
-    if (cart.length === 0) return false;
+  const confirmSale = useCallback(
+    async (formaPago) => {
+      if (cart.length === 0 || isConfirming) return false;
 
-    for (const item of cart) {
-      const product = products.find((p) => p.id === item.id);
-      if (!product || !hayStockDisponible(product.stock, item.cantidad)) {
-        setCartError(
-          `Stock insuficiente de "${item.nombre}". Revisá el carrito antes de confirmar.`
-        );
-        return false;
+      for (const item of cart) {
+        const product = products.find((p) => p.id === item.id);
+        if (!product || !hayStockDisponible(product.stock, item.cantidad)) {
+          setCartError(
+            `Stock insuficiente de "${item.nombre}". Revisá el carrito antes de confirmar.`
+          );
+          return false;
+        }
       }
-    }
 
-    const id = Math.max(0, ...ventas.map((v) => v.id)) + 1;
+      // PAYLOAD POST /api/ventas (según CreateVentaDto/CreateDetalleVentaDto del
+      // backend): { formaPago, detalles: [{ productoId, cantidad,
+      // precioUnitario }] }. El stock se descuenta en el servidor. formaPago es
+      // el número del enum (Efectivo=0, Debito=1, Credito=2, Transferencia=3,
+      // Otro=4).
+      const detalles = cart.map((item) => ({
+        productoId: item.id,
+        cantidad: item.cantidad,
+        precioUnitario: item.precio_actual,
+      }));
 
-    const items = cart.map((item) => ({
-      producto_id: item.id,
-      nombre: item.nombre,
-      cantidad: item.cantidad,
-      precio_unitario: item.precio_actual,
-      subtotal: calcularSubtotal(item.precio_actual, item.cantidad),
-    }));
-
-    const venta = {
-      id,
-      administrador_id: currentUser?.id ?? null,
-      fecha: new Date().toISOString(),
-      items,
-      total: calcularTotalCarrito(cart),
-    };
-
-    setVentas((prev) => [venta, ...prev]);
-    cart.forEach((item) => deductStock(item.id, item.cantidad));
-    setCart([]);
-    setCartError('');
-    return true;
-  }, [cart, products, ventas, deductStock, currentUser]);
+      setIsConfirming(true);
+      try {
+        await ventasService.create({ formaPago, detalles });
+        setCart([]);
+        setCartError('');
+        await refreshVentas();
+        await refreshProducts();
+        return true;
+      } catch (err) {
+        setCartError(err.message);
+        return false;
+      } finally {
+        setIsConfirming(false);
+      }
+    },
+    [cart, products, isConfirming, refreshVentas, refreshProducts]
+  );
 
   const cartTotal = useMemo(() => calcularTotalCarrito(cart), [cart]);
   const cartItemCount = useMemo(() => calcularCantidadItems(cart), [cart]);
   const cartEmpty = cart.length === 0;
-
-  const ventasConDetalle = useMemo(
-    () =>
-      ventas.map((venta) => ({
-        ...venta,
-        cantidad_items: calcularCantidadItems(venta.items),
-      })),
-    [ventas]
-  );
 
   return {
     cart,
@@ -171,7 +224,10 @@ export function useSales(products, deductStock) {
     cartItemCount,
     cartEmpty,
     cartError,
-    ventas: ventasConDetalle,
+    ventas,
+    isLoading,
+    error,
+    refreshVentas,
     addToCart,
     incrementQuantity,
     decrementQuantity,
@@ -180,3 +236,5 @@ export function useSales(products, deductStock) {
     confirmSale,
   };
 }
+
+export default useSales;

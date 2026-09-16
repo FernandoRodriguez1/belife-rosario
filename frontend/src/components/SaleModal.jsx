@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Minus, Plus, Search, ShoppingCart, Trash2, X } from 'lucide-react';
 import Button from './Button';
 import { formatCurrency } from '../utils/formatCurrency';
+import { FORMA_PAGO_OPTIONS } from '../utils/formaPago';
 
 function SaleModal({
   products,
@@ -18,6 +19,7 @@ function SaleModal({
   onClose,
 }) {
   const [query, setQuery] = useState('');
+  const [formaPago, setFormaPago] = useState(0);
 
   const normalizedQuery = query.trim().toLowerCase();
   const results = normalizedQuery
@@ -214,6 +216,27 @@ function SaleModal({
               {cartError}
             </p>
           )}
+
+          <div className="mt-5 flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between">
+            <label
+              htmlFor="forma_pago"
+              className="text-sm font-semibold text-gray-900"
+            >
+              Forma de pago
+            </label>
+            <select
+              id="forma_pago"
+              value={formaPago}
+              onChange={(e) => setFormaPago(Number(e.target.value))}
+              className="cursor-pointer rounded-full border border-gray-300 bg-white px-4 py-2 text-sm text-gray-900 shadow-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+            >
+              {FORMA_PAGO_OPTIONS.map(({ value, label }) => (
+                <option key={label} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-4 border-t border-gray-100 px-6 py-4">
@@ -229,7 +252,7 @@ function SaleModal({
             <Button variant="secondary" onClick={onClose}>
               Cancelar
             </Button>
-            <Button onClick={onConfirm} disabled={cartEmpty}>
+            <Button onClick={() => onConfirm(formaPago)} disabled={cartEmpty}>
               <ShoppingCart className="size-4" />
               Confirmar Venta
             </Button>

@@ -18,7 +18,7 @@ function LoginPage() {
     return <Navigate to="/" replace />;
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!usuario.trim() || !contraseña) {
@@ -26,11 +26,19 @@ function LoginPage() {
       return;
     }
 
-    const ok = login(usuario, contraseña);
-    if (ok) {
-      navigate('/dashboard', { replace: true });
-    } else {
-      setError('Usuario o contraseña incorrectos.');
+    try {
+      const ok = await login(usuario, contraseña);
+      if (ok) {
+        navigate('/dashboard', { replace: true });
+      } else {
+        setError('Usuario o contraseña incorrectos.');
+      }
+    } catch (err) {
+      setError(
+        err.status === 401
+          ? 'Usuario o contraseña incorrectos.'
+          : err.message
+      );
     }
   };
 
@@ -116,10 +124,7 @@ function LoginPage() {
           </Button>
 
           <p className="text-center text-xs text-gray-400">
-            Demo: usuario{' '}
-            <span className="font-medium text-gray-500">laura</span> ·
-            contraseña{' '}
-            <span className="font-medium text-gray-500">1234</span>
+            Usá tus credenciales del sistema.
           </p>
         </form>
       </div>
