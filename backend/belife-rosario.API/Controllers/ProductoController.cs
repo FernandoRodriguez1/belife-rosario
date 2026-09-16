@@ -86,10 +86,16 @@ public class ProductoController : ControllerBase
         if (!await _context.Marcas.AnyAsync(m => m.Id == dto.MarcaId))
             return BadRequest("La marca indicada no existe.");
 
+        var nombre = dto.Nombre.Trim();
+
+        if (await _context.Productos.AnyAsync(p =>
+                p.MarcaId == dto.MarcaId && p.Nombre.ToLower() == nombre.ToLower()))
+            return Conflict("Ya existe un producto con ese nombre para esa marca.");
+
         var producto = new Producto
         {
             Codigo = dto.Codigo,
-            Nombre = dto.Nombre,
+            Nombre = nombre,
             CategoriaId = dto.CategoriaId,
             MarcaId = dto.MarcaId,
             PrecioActual = dto.PrecioActual,
@@ -100,7 +106,15 @@ public class ProductoController : ControllerBase
         };
 
         _context.Productos.Add(producto);
-        await _context.SaveChangesAsync();
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateException)
+        {
+            return Conflict("Ya existe un producto con ese nombre para esa marca.");
+        }
 
         return CreatedAtAction(nameof(GetProducto), new { id = producto.Id }, await MapToResponse(producto.Id));
     }
@@ -122,8 +136,14 @@ public class ProductoController : ControllerBase
         if (!await _context.Marcas.AnyAsync(m => m.Id == dto.MarcaId))
             return BadRequest("La marca indicada no existe.");
 
+        var nombre = dto.Nombre.Trim();
+
+        if (await _context.Productos.AnyAsync(p =>
+                p.Id != id && p.MarcaId == dto.MarcaId && p.Nombre.ToLower() == nombre.ToLower()))
+            return Conflict("Ya existe un producto con ese nombre para esa marca.");
+
         producto.Codigo = dto.Codigo;
-        producto.Nombre = dto.Nombre;
+        producto.Nombre = nombre;
         producto.CategoriaId = dto.CategoriaId;
         producto.MarcaId = dto.MarcaId;
         producto.PrecioActual = dto.PrecioActual;
@@ -132,7 +152,14 @@ public class ProductoController : ControllerBase
         producto.UnidadMedida = dto.UnidadMedida;
         producto.UnidadPrecio = dto.UnidadPrecio;
 
-        await _context.SaveChangesAsync();
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateException)
+        {
+            return Conflict("Ya existe un producto con ese nombre para esa marca.");
+        }
 
         return NoContent();
     }
