@@ -140,6 +140,10 @@ public class BelifeDbContext : DbContext
                 .HasMaxLength(150)
                 .IsRequired();
 
+            entity.HasIndex(p => new { p.Nombre, p.MarcaId })
+                .IsUnique()
+                .HasDatabaseName("ix_producto_nombre_marca");
+
             entity.Property(p => p.CategoriaId)
                 .HasColumnName("categoria_id")
                 .IsRequired();
