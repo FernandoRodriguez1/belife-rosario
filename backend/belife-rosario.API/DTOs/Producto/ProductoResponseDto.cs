@@ -1,3 +1,5 @@
+using Belife.API.Enums;
+
 namespace Belife.API.DTOs.Producto;
 
 public class ProductoResponseDto
@@ -21,6 +23,8 @@ public class ProductoResponseDto
     public int Stock { get; set; }
 
     public bool Estado { get; set; }
+
+    public UnidadMedida UnidadMedida { get; set; }
 
     public DateTime FechaCreacion { get; set; }
 
