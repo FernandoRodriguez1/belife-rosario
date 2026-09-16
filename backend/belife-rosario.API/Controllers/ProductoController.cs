@@ -37,6 +37,7 @@ public class ProductoController : ControllerBase
                 Stock = p.Stock,
                 Estado = p.Estado,
                 UnidadMedida = p.UnidadMedida,
+                UnidadPrecio = p.UnidadPrecio,
                 FechaCreacion = p.FechaCreacion,
                 FechaUltimaModificacion = p.FechaUltimaModificacion
             })
@@ -64,6 +65,7 @@ public class ProductoController : ControllerBase
                 Stock = p.Stock,
                 Estado = p.Estado,
                 UnidadMedida = p.UnidadMedida,
+                UnidadPrecio = p.UnidadPrecio,
                 FechaCreacion = p.FechaCreacion,
                 FechaUltimaModificacion = p.FechaUltimaModificacion
             })
@@ -93,7 +95,8 @@ public class ProductoController : ControllerBase
             PrecioActual = dto.PrecioActual,
             Stock = dto.Stock,
             Estado = dto.Estado,
-            UnidadMedida = dto.UnidadMedida
+            UnidadMedida = dto.UnidadMedida,
+            UnidadPrecio = dto.UnidadPrecio
         };
 
         _context.Productos.Add(producto);
@@ -127,6 +130,7 @@ public class ProductoController : ControllerBase
         producto.Stock = dto.Stock;
         producto.Estado = dto.Estado;
         producto.UnidadMedida = dto.UnidadMedida;
+        producto.UnidadPrecio = dto.UnidadPrecio;
 
         await _context.SaveChangesAsync();
 
@@ -173,6 +177,7 @@ public class ProductoController : ControllerBase
                 Stock = p.Stock,
                 Estado = p.Estado,
                 UnidadMedida = p.UnidadMedida,
+                UnidadPrecio = p.UnidadPrecio,
                 FechaCreacion = p.FechaCreacion,
                 FechaUltimaModificacion = p.FechaUltimaModificacion
             })

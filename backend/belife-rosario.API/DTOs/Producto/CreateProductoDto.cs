@@ -19,4 +19,6 @@ public class CreateProductoDto
     public bool Estado { get; set; } = true;
 
     public UnidadMedida UnidadMedida { get; set; }
+
+    public UnidadPrecio? UnidadPrecio { get; set; }
 }

@@ -24,6 +24,8 @@ public class Producto
 
     public UnidadMedida UnidadMedida { get; set; }
 
+    public UnidadPrecio? UnidadPrecio { get; set; }
+
     public DateTime FechaCreacion { get; set; }
 
     public DateTime FechaUltimaModificacion { get; set; }
