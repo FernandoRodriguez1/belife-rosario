@@ -1,40 +1,36 @@
-import { useMemo, useState } from 'react';
-import { createPortal } from 'react-dom';
-import { ChevronDown, ChevronRight, Trash2, X } from 'lucide-react';
-import Button from './Button';
-import { formatCurrency } from '../utils/formatCurrency';
-import { formatFecha } from '../utils/formatFecha';
-import { labelFormaPago } from '../utils/formaPago';
-import {
-  esModoKilos,
-  aKilos,
-  GRAMOS_POR_KILO,
-} from '../utils/unidadPrecio';
-import ConfirmDialog from './ConfirmDialog';
+import { useMemo, useState } from "react";
+import { createPortal } from "react-dom";
+import { ChevronDown, ChevronRight, Trash2, X } from "lucide-react";
+import Button from "./Button";
+import { formatCurrency } from "../utils/formatCurrency";
+import { formatFecha } from "../utils/formatFecha";
+import { labelFormaPago } from "../utils/formaPago";
+import { esModoKilos, aKilos, GRAMOS_POR_KILO } from "../utils/unidadPrecio";
+import ConfirmDialog from "./ConfirmDialog";
 
 const GRAMOS_POR_C_IEN = 100;
-const ZONA_ARGENTINA = 'America/Argentina/Buenos_Aires';
+const ZONA_ARGENTINA = "America/Argentina/Buenos_Aires";
 
 // El backend guarda FechaHora como hora Argentina sin zona
 // ("YYYY-MM-DDTHH:mm:ss"), así que el día calendario es el literal del string,
 // sin reconvertir zonas.
 function extraerDia(iso) {
-  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(iso ?? ''));
+  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(iso ?? ""));
   return match ? match[0] : null;
 }
 
 // Día calendario actual ("YYYY-MM-DD") en la zona horaria Argentina.
 function diaEnArgentina(instante) {
-  return new Intl.DateTimeFormat('en-CA', {
+  return new Intl.DateTimeFormat("en-CA", {
     timeZone: ZONA_ARGENTINA,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
   }).format(instante);
 }
 
 function formatearFechaCorta(isoDia) {
-  const [anio, mes, dia] = isoDia.split('-');
+  const [anio, mes, dia] = isoDia.split("-");
   return `${dia}/${mes}/${anio}`;
 }
 
@@ -45,7 +41,7 @@ function formatearCantidad(item) {
   if (esModoKilos(item.unidad_medida, item.unidad_precio)) {
     return `${aKilos(item.cantidad)} kg`;
   }
-  if (item.unidad_medida === 'Gramos') {
+  if (item.unidad_medida === "Gramos") {
     return `${item.cantidad} g`;
   }
   return String(item.cantidad);
@@ -57,21 +53,26 @@ function formatearPrecio(item) {
   if (esModoKilos(item.unidad_medida, item.unidad_precio)) {
     return `${formatCurrency(item.precio_unitario * GRAMOS_POR_KILO)}/kg`;
   }
-  if (item.unidad_medida === 'Gramos') {
-    return `${formatCurrency(
-      item.precio_unitario * GRAMOS_POR_C_IEN
-    )} c/100 g`;
+  if (item.unidad_medida === "Gramos") {
+    return `${formatCurrency(item.precio_unitario * GRAMOS_POR_C_IEN)} c/100 g`;
   }
   return formatCurrency(item.precio_unitario);
 }
 
-function SalesHistoryModal({ ventas, isLoading = false, error = '', onClose, onDelete = async () => {} }) {
+function SalesHistoryModal({
+  ventas,
+  isLoading = false,
+  error = "",
+  onClose,
+  onDelete = async () => {},
+}) {
   const [expandedId, setExpandedId] = useState(null);
+  const [expandedDia, setExpandedDia] = useState(null);
   const [ventaToDelete, setVentaToDelete] = useState(null);
-  const [deleteError, setDeleteError] = useState('');
+  const [deleteError, setDeleteError] = useState("");
   const [deleting, setDeleting] = useState(false);
-  const [desde, setDesde] = useState('');
-  const [hasta, setHasta] = useState('');
+  const [desde, setDesde] = useState("");
+  const [hasta, setHasta] = useState("");
 
   const filtroActivo = Boolean(desde || hasta);
 
@@ -97,28 +98,32 @@ function SalesHistoryModal({ ventas, isLoading = false, error = '', onClose, onD
     const ayer = diaEnArgentina(fechaAyer);
     const porDia = new Map();
     for (const v of ventasFiltradas) {
-      const dia = extraerDia(v.fecha) ?? '';
+      const dia = extraerDia(v.fecha) ?? "";
       if (!porDia.has(dia)) porDia.set(dia, []);
       porDia.get(dia).push(v);
     }
     return Array.from(porDia, ([dia, items]) => ({
       dia,
       etiqueta:
-        dia === hoy ? 'Hoy' : dia === ayer ? 'Ayer' : formatearFechaCorta(dia),
+        dia === hoy ? "Hoy" : dia === ayer ? "Ayer" : formatearFechaCorta(dia),
+      total: items.reduce((sum, v) => sum + v.total, 0),
       items,
     }));
   }, [ventasFiltradas]);
 
   const limpiarFiltro = () => {
-    setDesde('');
-    setHasta('');
+    setDesde("");
+    setHasta("");
   };
 
   const toggleExpand = (id) =>
     setExpandedId((prev) => (prev === id ? null : id));
 
+  const toggleDia = (dia) =>
+    setExpandedDia((prev) => (prev === dia ? null : dia));
+
   const requestDelete = (venta) => {
-    setDeleteError('');
+    setDeleteError("");
     setVentaToDelete(venta);
   };
 
@@ -138,9 +143,7 @@ function SalesHistoryModal({ ventas, isLoading = false, error = '', onClose, onD
   };
 
   return createPortal(
-    <div
-      className="fixed inset-0 z-50 flex items-start justify-center bg-gray-900/40 p-4 sm:items-center"
-    >
+    <div className="fixed inset-0 z-50 flex items-start justify-center bg-gray-900/40 p-4 sm:items-center">
       <div
         className="flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl bg-white shadow-xl"
         onClick={(e) => e.stopPropagation()}
@@ -212,112 +215,149 @@ function SalesHistoryModal({ ventas, isLoading = false, error = '', onClose, onD
             </p>
           ) : (
             <ul className="space-y-4">
-              {grupos.map((grupo) => (
-                <li key={grupo.dia}>
-                  <p className="mb-1 px-2 text-xs font-semibold uppercase tracking-wide text-gray-400">
-                    {grupo.etiqueta}
-                  </p>
-                  <ul className="divide-y divide-gray-100 rounded-xl border border-gray-100">
-                    {grupo.items.map((venta) => {
-                // El backend de ventas no expone el administrador; el nombre
-                // llega en venta.administrador_nombre solo si se agrega luego.
-                const admin = venta.administrador_nombre ?? 'Administrador';
-                const isExpanded = expandedId === venta.id;
+              {grupos.map((grupo) => {
+                const diaExpandido = expandedDia === grupo.dia;
+                const mostrarFecha =
+                  grupo.etiqueta === "Hoy" || grupo.etiqueta === "Ayer";
                 return (
-                  <li key={venta.id} className="py-2">
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        onClick={() => toggleExpand(venta.id)}
-                        className="flex flex-1 items-center gap-3 rounded-xl px-2 py-2 text-left transition-colors duration-150 hover:bg-gray-50"
-                      >
-                        <div className="min-w-0">
-                          <p className="text-sm font-medium text-gray-900">
-                            {formatFecha(venta.fecha)}
-                          </p>
-                          <p className="mt-0.5 truncate text-xs text-gray-500">
-                            {admin} · {venta.cantidad_items} productos ·{' '}
-                            {labelFormaPago(venta.forma_pago)}
-                          </p>
-                        </div>
-                        <span className="ml-auto font-display text-sm font-semibold text-gray-900">
-                          {formatCurrency(venta.total)}
+                  <li key={grupo.dia}>
+                    <button
+                      onClick={() => toggleDia(grupo.dia)}
+                      className={`flex w-full items-center justify-between gap-3 rounded-xl border border-gray-100 px-4 py-3 text-left transition-colors duration-150 hover:bg-gray-50 ${diaExpandido ? "bg-gray-100" : "bg-white"}`}
+                    >
+                      <div className="min-w-0">
+                        <p className="font-display text-sm font-semibold text-gray-900">
+                          {grupo.etiqueta}
+                          {mostrarFecha && (
+                            <span className="ml-2 text-xs font-medium text-gray-400">
+                              {formatearFechaCorta(grupo.dia)}
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                      <span className="flex items-center gap-3">
+                        <span className="text-xs text-gray-500">
+                          Total vendido:
                         </span>
-                        {isExpanded ? (
-                          <ChevronDown className="size-4 text-gray-400" />
+                        <span className="font-display text-sm font-bold text-gray-900">
+                          {formatCurrency(grupo.total)}
+                        </span>
+                        {diaExpandido ? (
+                          <ChevronDown className="size-4 shrink-0 text-gray-400" />
                         ) : (
-                          <ChevronRight className="size-4 text-gray-400" />
+                          <ChevronRight className="size-4 shrink-0 text-gray-400" />
                         )}
-                      </button>
+                      </span>
+                    </button>
 
-                      <button
-                        onClick={() => requestDelete(venta)}
-                        disabled={deleting}
-                        className="shrink-0 rounded-lg p-2 text-gray-400 transition-colors duration-150 hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-50"
-                        title="Eliminar venta"
-                      >
-                        <Trash2 className="size-4" />
-                      </button>
-                    </div>
+                    {diaExpandido && (
+                      <div className="mt-2 rounded-xl border border-gray-100 p-1.5">
+                        <ul className="divide-y divide-gray-100">
+                          {grupo.items.map((venta) => {
+                            // El backend de ventas no expone el administrador; el nombre
+                            // llega en venta.administrador_nombre solo si se agrega luego.
+                            const admin =
+                              venta.administrador_nombre ?? "Administrador";
+                            const isExpanded = expandedId === venta.id;
+                            return (
+                              <li key={venta.id} className="py-2">
+                                <div className="flex items-center gap-1.5">
+                                  <button
+                                    onClick={() => toggleExpand(venta.id)}
+                                    className="flex flex-1 items-center gap-3 rounded-xl px-2 py-2 text-left transition-colors duration-150 hover:bg-gray-50"
+                                  >
+                                    <div className="min-w-0">
+                                      <p className="text-sm font-medium text-gray-900">
+                                        {formatFecha(venta.fecha)}
+                                      </p>
+                                      <p className="mt-0.5 truncate text-xs text-gray-500">
+                                        {admin} · {venta.cantidad_items}{" "}
+                                        productos ·{" "}
+                                        {labelFormaPago(venta.forma_pago)}
+                                      </p>
+                                    </div>
+                                    <span className="ml-auto font-display text-sm font-semibold text-gray-900">
+                                      {formatCurrency(venta.total)}
+                                    </span>
+                                    {isExpanded ? (
+                                      <ChevronDown className="size-4 text-gray-400" />
+                                    ) : (
+                                      <ChevronRight className="size-4 text-gray-400" />
+                                    )}
+                                  </button>
 
-                    {isExpanded && (
-                      <div className="px-2 pb-3 pt-1">
-                        <div className="overflow-x-auto rounded-xl border border-gray-200">
-                          <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
-                              <tr>
-                                <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 sm:px-4">
-                                  Producto
-                                </th>
-                                <th className="px-3 py-2 text-right text-xs font-semibold uppercase tracking-wide text-gray-500 sm:px-4">
-                                  Cant.
-                                </th>
-                                <th className="px-3 py-2 text-right text-xs font-semibold uppercase tracking-wide text-gray-500 sm:px-4">
-                                  Precio
-                                </th>
-                                <th className="px-3 py-2 text-right text-xs font-semibold uppercase tracking-wide text-gray-500 sm:px-4">
-                                  Subtotal
-                                </th>
-                              </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-100">
-                              {venta.items.map((item) => (
-                                <tr key={item.producto_id}>
-                                  <td className="px-3 py-2.5 text-sm text-gray-900 sm:px-4">
-                                    {item.nombre}
-                                  </td>
-                                  <td className="px-3 py-2.5 text-right text-sm text-gray-500 sm:px-4">
-                                    {formatearCantidad(item)}
-                                  </td>
-                                  <td className="px-3 py-2.5 text-right whitespace-nowrap text-sm text-gray-500 sm:px-4">
-                                    {formatearPrecio(item)}
-                                  </td>
-                                  <td className="px-3 py-2.5 text-right whitespace-nowrap font-display text-sm font-semibold text-gray-900 sm:px-4">
-                                    {formatCurrency(item.subtotal)}
-                                  </td>
-                                </tr>
-                              ))}
-                              <tr className="bg-gray-50">
-                                <td
-                                  colSpan="3"
-                                  className="px-3 py-2.5 text-right text-sm font-medium text-gray-500 sm:px-4"
-                                >
-                                  Total
-                                </td>
-                                <td className="px-3 py-2.5 text-right whitespace-nowrap font-display text-sm font-bold text-gray-900 sm:px-4">
-                                  {formatCurrency(venta.total)}
-                                </td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        </div>
+                                  <button
+                                    onClick={() => requestDelete(venta)}
+                                    disabled={deleting}
+                                    className="shrink-0 rounded-lg p-2 text-gray-400 transition-colors duration-150 hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-50"
+                                    title="Eliminar venta"
+                                  >
+                                    <Trash2 className="size-4" />
+                                  </button>
+                                </div>
+
+                                {isExpanded && (
+                                  <div className="px-2 pb-3 pt-1">
+                                    <div className="overflow-x-auto rounded-xl border border-gray-200">
+                                      <table className="min-w-full divide-y divide-gray-200">
+                                        <thead className="bg-gray-50">
+                                          <tr>
+                                            <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 sm:px-4">
+                                              Producto
+                                            </th>
+                                            <th className="px-3 py-2 text-right text-xs font-semibold uppercase tracking-wide text-gray-500 sm:px-4">
+                                              Cant.
+                                            </th>
+                                            <th className="px-3 py-2 text-right text-xs font-semibold uppercase tracking-wide text-gray-500 sm:px-4">
+                                              Precio
+                                            </th>
+                                            <th className="px-3 py-2 text-right text-xs font-semibold uppercase tracking-wide text-gray-500 sm:px-4">
+                                              Subtotal
+                                            </th>
+                                          </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-100">
+                                          {venta.items.map((item) => (
+                                            <tr key={item.producto_id}>
+                                              <td className="px-3 py-2.5 text-sm text-gray-900 sm:px-4">
+                                                {item.nombre}
+                                              </td>
+                                              <td className="px-3 py-2.5 text-right text-sm text-gray-500 sm:px-4">
+                                                {formatearCantidad(item)}
+                                              </td>
+                                              <td className="px-3 py-2.5 text-right whitespace-nowrap text-sm text-gray-500 sm:px-4">
+                                                {formatearPrecio(item)}
+                                              </td>
+                                              <td className="px-3 py-2.5 text-right whitespace-nowrap font-display text-sm font-semibold text-gray-900 sm:px-4">
+                                                {formatCurrency(item.subtotal)}
+                                              </td>
+                                            </tr>
+                                          ))}
+                                          <tr className="bg-gray-50">
+                                            <td
+                                              colSpan="3"
+                                              className="px-3 py-2.5 text-right text-sm font-medium text-gray-500 sm:px-4"
+                                            >
+                                              Total
+                                            </td>
+                                            <td className="px-3 py-2.5 text-right whitespace-nowrap font-display text-sm font-bold text-gray-900 sm:px-4">
+                                              {formatCurrency(venta.total)}
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </div>
+                                )}
+                              </li>
+                            );
+                          })}
+                        </ul>
                       </div>
                     )}
                   </li>
                 );
-                    })}
-                  </ul>
-                </li>
-              ))}
+              })}
             </ul>
           )}
         </div>
@@ -327,7 +367,7 @@ function SalesHistoryModal({ ventas, isLoading = false, error = '', onClose, onD
         <ConfirmDialog
           title="Eliminar venta"
           message={`¿Eliminar la venta de ${formatFecha(
-            ventaToDelete.fecha
+            ventaToDelete.fecha,
           )} por ${formatCurrency(ventaToDelete.total)}? Esta acción no se puede deshacer.`}
           warning="Esto no devuelve el stock a los productos automáticamente."
           confirmLabel="Eliminar"
@@ -336,7 +376,7 @@ function SalesHistoryModal({ ventas, isLoading = false, error = '', onClose, onD
         />
       )}
     </div>,
-    document.body
+    document.body,
   );
 }
 
