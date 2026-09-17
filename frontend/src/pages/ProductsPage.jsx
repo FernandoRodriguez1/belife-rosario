@@ -29,10 +29,8 @@ function ProductsPage() {
     deleteProduct,
     query,
     setQuery,
-    sortBy,
-    setSortBy,
-    sortDir,
-    setSortDir,
+    sort,
+    setSort,
     onlyLowStock,
     setOnlyLowStock,
   } = useProducts();
@@ -146,12 +144,8 @@ function ProductsPage() {
         <SearchBar
           query={query}
           onQueryChange={setQuery}
-          sortBy={sortBy}
-          onSortChange={setSortBy}
-          sortDir={sortDir}
-          onSortDirChange={() =>
-            setSortDir((prev) => (prev === 'asc' ? 'desc' : 'asc'))
-          }
+          sort={sort}
+          onSortChange={setSort}
           onNewProduct={openNewProduct}
           onNewSale={() => setSaleOpen(true)}
           onlyLowStock={onlyLowStock}

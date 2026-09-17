@@ -1,8 +1,6 @@
 import {
   AlertTriangle,
-  ArrowDown,
   ArrowDownWideNarrow,
-  ArrowUp,
   Plus,
   Search,
   ShoppingCart,
@@ -12,10 +10,8 @@ import Button from './Button';
 function SearchBar({
   query,
   onQueryChange,
-  sortBy,
+  sort,
   onSortChange,
-  sortDir,
-  onSortDirChange,
   onNewProduct,
   onNewSale,
   onlyLowStock,
@@ -45,32 +41,18 @@ function SearchBar({
         <div className="relative w-full sm:w-auto">
           <ArrowDownWideNarrow className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
           <select
-            value={sortBy}
+            value={sort}
             onChange={(e) => onSortChange(e.target.value)}
             className="w-full cursor-pointer rounded-full border border-gray-300 bg-white py-2 pl-9 pr-8 text-sm text-gray-700 shadow-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
           >
-            <option value="name">Nombre</option>
-            <option value="price">Precio</option>
-            <option value="stock">Stock</option>
+            <option value="name-asc">Nombre (A-Z)</option>
+            <option value="name-desc">Nombre (Z-A)</option>
+            <option value="price-asc">Precio (menor a mayor)</option>
+            <option value="price-desc">Precio (mayor a menor)</option>
+            <option value="stock-asc">Stock (menor a mayor)</option>
+            <option value="stock-desc">Stock (mayor a menor)</option>
           </select>
         </div>
-        <Button
-          variant="secondary"
-          onClick={onSortDirChange}
-          title={
-            sortDir === 'asc'
-              ? 'Ordenar descendente'
-              : 'Ordenar ascendente'
-          }
-          className="w-full sm:w-auto"
-        >
-          {sortDir === 'asc' ? (
-            <ArrowUp className="size-4" />
-          ) : (
-            <ArrowDown className="size-4" />
-          )}
-          {sortDir === 'asc' ? 'Ascendente' : 'Descendente'}
-        </Button>
         <Button
           variant="secondary"
           onClick={onNewSale}

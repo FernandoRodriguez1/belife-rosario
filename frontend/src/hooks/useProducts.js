@@ -64,8 +64,9 @@ export function useProducts() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [query, setQuery] = useState('');
-  const [sortBy, setSortBy] = useState('name');
-  const [sortDir, setSortDir] = useState('asc');
+  // Orden combinado en una sola variable: campo + dirección ("name-asc",
+  // "price-desc", "stock-asc", etc.), tal como lo emite el selector único.
+  const [sort, setSort] = useState('name-asc');
   const [onlyLowStock, setOnlyLowStock] = useState(false);
 
   const refreshProducts = useCallback(async () => {
@@ -157,12 +158,13 @@ export function useProducts() {
       visible = filtrarStockBajo(visible);
     }
 
-    const sortFactor = sortDir === 'desc' ? -1 : 1;
+    const [sortField, sortOrder] = sort.split('-');
+    const sortFactor = sortOrder === 'desc' ? -1 : 1;
 
     // La dirección se aplica de forma consistente a los 3 campos: Nombre
     // (A-Z/Z-A), Precio y Stock (menor-mayor/mayor-menor).
     return [...visible].sort((a, b) => {
-      switch (sortBy) {
+      switch (sortField) {
         case 'price':
           return (a.precio_actual - b.precio_actual) * sortFactor;
         case 'stock':
@@ -172,7 +174,7 @@ export function useProducts() {
           return a.nombre.localeCompare(b.nombre) * sortFactor;
       }
     });
-  }, [products, query, sortBy, sortDir, onlyLowStock]);
+  }, [products, query, sort, onlyLowStock]);
 
   return {
     products: filteredProducts,
@@ -188,10 +190,8 @@ export function useProducts() {
     deleteProduct,
     query,
     setQuery,
-    sortBy,
-    setSortBy,
-    sortDir,
-    setSortDir,
+    sort,
+    setSort,
     onlyLowStock,
     setOnlyLowStock,
   };
