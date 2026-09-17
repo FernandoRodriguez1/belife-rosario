@@ -24,6 +24,7 @@ function SaleModal({
   cartItemCount,
   cartEmpty,
   cartError,
+  isConfirming = false,
   onAddToCart,
   onIncrement,
   onDecrement,
@@ -81,7 +82,8 @@ function SaleModal({
           </div>
           <button
             onClick={onClose}
-            className="rounded-lg p-2 text-gray-400 transition-colors duration-150 hover:bg-gray-100 hover:text-gray-600"
+            disabled={isConfirming}
+            className="rounded-lg p-2 text-gray-400 transition-colors duration-150 hover:bg-gray-100 hover:text-gray-600 disabled:cursor-not-allowed disabled:opacity-50"
             title="Cerrar"
           >
             <X className="size-5" />
@@ -364,10 +366,14 @@ function SaleModal({
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="secondary" onClick={onClose}>
+            <Button variant="secondary" onClick={onClose} disabled={isConfirming}>
               Cancelar
             </Button>
-            <Button onClick={() => onConfirm(formaPago)} disabled={cartEmpty}>
+            <Button
+              onClick={() => onConfirm(formaPago)}
+              disabled={cartEmpty}
+              loading={isConfirming}
+            >
               <ShoppingCart className="size-4" />
               Confirmar Venta
             </Button>

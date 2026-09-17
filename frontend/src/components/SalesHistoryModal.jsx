@@ -7,6 +7,7 @@ import { formatFecha } from "../utils/formatFecha";
 import { labelFormaPago } from "../utils/formaPago";
 import { esModoKilos, aKilos, GRAMOS_POR_KILO } from "../utils/unidadPrecio";
 import ConfirmDialog from "./ConfirmDialog";
+import { useToast } from "../hooks/useToast";
 
 const GRAMOS_POR_C_IEN = 100;
 const ZONA_ARGENTINA = "America/Argentina/Buenos_Aires";
@@ -73,6 +74,7 @@ function SalesHistoryModal({
   const [deleting, setDeleting] = useState(false);
   const [desde, setDesde] = useState("");
   const [hasta, setHasta] = useState("");
+  const toast = useToast();
 
   const filtroActivo = Boolean(desde || hasta);
 
@@ -134,9 +136,11 @@ function SalesHistoryModal({
       await onDelete(ventaToDelete.id);
       if (expandedId === ventaToDelete.id) setExpandedId(null);
       setVentaToDelete(null);
+      toast.success('La venta se eliminó correctamente');
     } catch (err) {
       setDeleteError(err.message);
       setVentaToDelete(null);
+      toast.error(err.message);
     } finally {
       setDeleting(false);
     }
@@ -371,6 +375,7 @@ function SalesHistoryModal({
           )} por ${formatCurrency(ventaToDelete.total)}? Esta acción no se puede deshacer.`}
           warning="Esto no devuelve el stock a los productos automáticamente."
           confirmLabel="Eliminar"
+          loading={deleting}
           onConfirm={confirmDelete}
           onCancel={() => setVentaToDelete(null)}
         />

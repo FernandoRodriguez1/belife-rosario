@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import Spinner from '../Spinner';
 import {
   ESTADOS,
   UNIDADES,
@@ -47,6 +48,7 @@ function ProductForm({
   onClose,
   onSave,
   submitError = '',
+  isSubmitting = false,
 }) {
   const isEditing = Boolean(product);
   const [form, setForm] = useState(() => {
@@ -426,15 +428,18 @@ const handleChange = useCallback((e) => {
         )}
         <button
           type="button"
-          className="inline-flex items-center justify-center rounded-full font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 active:scale-[0.98] bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus-visible:ring-gray-400 px-4 py-2 text-sm gap-2"
+          className="inline-flex items-center justify-center rounded-full font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 active:scale-[0.98] bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus-visible:ring-gray-400 px-4 py-2 text-sm gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           onClick={onClose}
+          disabled={isSubmitting}
         >
           Cancelar
         </button>
         <button
           type="submit"
-          className="inline-flex items-center justify-center rounded-full font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 active:scale-[0.98] bg-brand-600 text-white shadow-sm hover:bg-brand-700 focus-visible:ring-brand-500 px-4 py-2 text-sm gap-2"
+          className="inline-flex items-center justify-center rounded-full font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 active:scale-[0.98] bg-brand-600 text-white shadow-sm hover:bg-brand-700 focus-visible:ring-brand-500 px-4 py-2 text-sm gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={isSubmitting}
         >
+          {isSubmitting && <Spinner size="sm" />}
           {isEditing ? 'Guardar cambios' : 'Guardar producto'}
         </button>
       </div>

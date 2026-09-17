@@ -1,13 +1,17 @@
 import { useMemo, useCallback, useState } from 'react';
 import { useApi } from './useApi';
+import { useToast } from './useToast';
 
 export function useCatalog(service, labelSingular) {
   const api = useApi(service);
+  const toast = useToast();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [modalError, setModalError] = useState('');
   const [itemToDelete, setItemToDelete] = useState(null);
   const [deleteError, setDeleteError] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const existingNames = useMemo(() => {
     const id = editingItem?.id;
@@ -29,11 +33,15 @@ export function useCatalog(service, labelSingular) {
   }, []);
 
   const handleSave = useCallback(async (payload) => {
+    if (isSaving) return;
+    setIsSaving(true);
     try {
       if (editingItem) {
         await api.update(payload.id, payload);
+        toast.success(`La ${labelSingular} ha sido modificada correctamente`);
       } else {
         await api.create(payload);
+        toast.success(`La ${labelSingular} se creó correctamente`);
       }
       setModalError('');
       setModalOpen(false);
@@ -41,21 +49,29 @@ export function useCatalog(service, labelSingular) {
       await api.refresh();
     } catch (err) {
       setModalError(err.message);
+      toast.error(err.message);
+    } finally {
+      setIsSaving(false);
     }
-  }, [api, editingItem]);
+  }, [api, editingItem, isSaving, labelSingular, toast]);
 
   const handleConfirmDelete = useCallback(async () => {
-    if (!itemToDelete) return;
+    if (!itemToDelete || isDeleting) return;
+    setIsDeleting(true);
     try {
       await api.remove(itemToDelete.id);
       setDeleteError('');
       setItemToDelete(null);
       await api.refresh();
+      toast.success(`La ${labelSingular} se ha eliminado correctamente`);
     } catch (err) {
       setDeleteError(err.message);
       setItemToDelete(null);
+      toast.error(err.message);
+    } finally {
+      setIsDeleting(false);
     }
-  }, [api, itemToDelete]);
+  }, [api, itemToDelete, isDeleting, labelSingular, toast]);
 
   const bannerError = api.error || deleteError;
 
@@ -71,6 +87,8 @@ export function useCatalog(service, labelSingular) {
     setItemToDelete,
     deleteError,
     setDeleteError,
+    isSaving,
+    isDeleting,
     existingNames,
     openNew,
     openEdit,

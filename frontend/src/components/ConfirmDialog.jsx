@@ -2,7 +2,7 @@ import { AlertTriangle } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import Button from './Button';
 
-function ConfirmDialog({ title = 'Confirmar acción', message, warning, confirmLabel = 'Eliminar', onConfirm, onCancel }) {
+function ConfirmDialog({ title = 'Confirmar acción', message, warning, confirmLabel = 'Eliminar', onConfirm, onCancel, loading = false }) {
   return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-start justify-center bg-gray-900/40 p-4 sm:items-center"
@@ -27,10 +27,10 @@ function ConfirmDialog({ title = 'Confirmar acción', message, warning, confirmL
           </div>
         </div>
         <div className="mt-6 flex flex-wrap justify-end gap-3">
-          <Button variant="secondary" onClick={onCancel}>
+          <Button variant="secondary" onClick={onCancel} disabled={loading}>
             Cancelar
           </Button>
-          <Button variant="danger" onClick={onConfirm}>
+          <Button variant="danger" onClick={onConfirm} loading={loading}>
             {confirmLabel}
           </Button>
         </div>

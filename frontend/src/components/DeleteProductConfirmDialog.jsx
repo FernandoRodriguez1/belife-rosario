@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { AlertTriangle, X, Loader2 } from 'lucide-react';
+import { AlertTriangle, X } from 'lucide-react';
 import Button from './Button';
+import Spinner from './Spinner';
 import { formatCurrency } from '../utils/formatCurrency';
 import { formatFecha } from '../utils/formatFecha';
 import { labelFormaPago } from '../utils/formaPago';
 import { ventasService } from '../services/ventasService';
 
-function DeleteProductConfirmDialog({ product, onConfirm, onCancel }) {
+function DeleteProductConfirmDialog({ product, onConfirm, onCancel, loading = false }) {
   const [ventas, setVentas] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -62,7 +63,7 @@ function DeleteProductConfirmDialog({ product, onConfirm, onCancel }) {
         <div className="min-h-0 flex-1 overflow-y-auto p-5 sm:p-6">
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
-              <Loader2 className="size-6 text-brand-600 animate-spin" />
+              <Spinner size="lg" className="text-brand-600" />
               <span className="ml-3 text-sm text-gray-500">Cargando ventas...</span>
             </div>
           ) : error ? (
@@ -116,10 +117,10 @@ function DeleteProductConfirmDialog({ product, onConfirm, onCancel }) {
         </div>
 
         <div className="flex shrink-0 flex-wrap justify-end gap-3 border-t border-gray-100 px-5 py-4 sm:px-6">
-          <Button variant="secondary" onClick={onCancel}>
+          <Button variant="secondary" onClick={onCancel} disabled={loading}>
             Cancelar
           </Button>
-          <Button variant="danger" onClick={onConfirm}>
+          <Button variant="danger" onClick={onConfirm} loading={loading}>
             Eliminar
           </Button>
         </div>

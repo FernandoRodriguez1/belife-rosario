@@ -20,6 +20,8 @@ function CatalogPage({ title, icon: Icon, labelSingular, service, emptyMessage, 
     setModalError,
     itemToDelete,
     setItemToDelete,
+    isSaving,
+    isDeleting,
     existingNames,
     openNew,
     openEdit,
@@ -93,6 +95,7 @@ function CatalogPage({ title, icon: Icon, labelSingular, service, emptyMessage, 
           labelSingular={labelSingular}
           existingNames={existingNames}
           submitError={modalError}
+          isSubmitting={isSaving}
           onClose={() => {
             setModalOpen(false);
             setEditingItem(null);
@@ -107,6 +110,7 @@ function CatalogPage({ title, icon: Icon, labelSingular, service, emptyMessage, 
           title={`Eliminar ${labelSingular}`}
           message={`¿Estás seguro de que querés eliminar "${itemToDelete.nombre}"? Esta acción no se puede deshacer.`}
           confirmLabel="Eliminar"
+          loading={isDeleting}
           onConfirm={handleConfirmDelete}
           onCancel={() => setItemToDelete(null)}
         />

@@ -14,6 +14,7 @@ import { useProducts } from '../hooks/useProducts';
 import { usePriceHistory } from '../hooks/usePriceHistory';
 import { useSales } from '../hooks/useSales';
 import { useApi } from '../hooks/useApi';
+import { useToast } from '../hooks/useToast';
 import { categoriasService, marcasService } from '../services/catalogService';
 
 function ProductsPage() {
@@ -43,6 +44,7 @@ function ProductsPage() {
     error: historyError,
   } = usePriceHistory();
   const sales = useSales(allProducts, refreshProducts);
+  const toast = useToast();
 
   const { data: categorias } = useApi(categoriasService);
   const { data: marcas } = useApi(marcasService);
@@ -55,6 +57,8 @@ function ProductsPage() {
   const [historyProduct, setHistoryProduct] = useState(null);
   const [saleOpen, setSaleOpen] = useState(false);
   const [salesHistoryOpen, setSalesHistoryOpen] = useState(false);
+  const [savingProduct, setSavingProduct] = useState(false);
+  const [deletingProduct, setDeletingProduct] = useState(false);
 
   const openNewProduct = () => {
     setEditingProduct(null);
@@ -69,6 +73,8 @@ function ProductsPage() {
   };
 
   const handleSave = async (payload) => {
+    if (savingProduct) return;
+    setSavingProduct(true);
     try {
       if (editingProduct) {
         const priceChanged =
@@ -82,26 +88,36 @@ function ProductsPage() {
           });
         }
         await updateProduct(payload);
+        toast.success('El producto ha sido modificado correctamente');
       } else {
         await addProduct(payload);
+        toast.success('El producto se creó correctamente');
       }
       setModalError('');
       setModalOpen(false);
       setEditingProduct(null);
     } catch (err) {
       setModalError(err.message);
+      toast.error(err.message);
+    } finally {
+      setSavingProduct(false);
     }
   };
 
   const handleConfirmDelete = async () => {
-    if (!productToDelete) return;
+    if (!productToDelete || deletingProduct) return;
+    setDeletingProduct(true);
     try {
       await deleteProduct(productToDelete.id);
       setDeleteError('');
       setProductToDelete(null);
+      toast.success('El producto se eliminó correctamente');
     } catch (err) {
       setDeleteError(err.message);
       setProductToDelete(null);
+      toast.error(err.message);
+    } finally {
+      setDeletingProduct(false);
     }
   };
 
@@ -194,13 +210,20 @@ function ProductsPage() {
           cartItemCount={sales.cartItemCount}
           cartEmpty={sales.cartEmpty}
           cartError={sales.cartError}
+          isConfirming={sales.isConfirming}
           onAddToCart={sales.addToCart}
           onIncrement={sales.incrementQuantity}
           onDecrement={sales.decrementQuantity}
           onSetQuantity={sales.setQuantity}
           onRemove={sales.removeFromCart}
           onConfirm={async (formaPago) => {
-            if (await sales.confirmSale(formaPago)) setSaleOpen(false);
+            const result = await sales.confirmSale(formaPago);
+            if (result.ok) {
+              toast.success('La venta se creó correctamente');
+              setSaleOpen(false);
+            } else if (result.error) {
+              toast.error(result.error);
+            }
           }}
           onClose={() => {
             sales.clearCart();
@@ -217,6 +240,7 @@ function ProductsPage() {
           categorias={categorias}
           marcas={marcas}
           submitError={modalError}
+          isSubmitting={savingProduct}
           onClose={() => {
             setModalOpen(false);
             setEditingProduct(null);
@@ -239,6 +263,7 @@ function ProductsPage() {
       {productToDelete && (
         <DeleteProductConfirmDialog
           product={productToDelete}
+          loading={deletingProduct}
           onConfirm={handleConfirmDelete}
           onCancel={() => setProductToDelete(null)}
         />

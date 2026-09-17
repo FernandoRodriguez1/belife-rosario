@@ -2,7 +2,7 @@ import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import ProductForm from './forms/ProductForm';
 
-function ProductModal({ product = null, products = [], categorias = [], marcas = [], onClose, onSave, submitError = '' }) {
+function ProductModal({ product = null, products = [], categorias = [], marcas = [], onClose, onSave, submitError = '', isSubmitting = false }) {
   const isEditing = Boolean(product);
 
   return createPortal(
@@ -40,6 +40,7 @@ function ProductModal({ product = null, products = [], categorias = [], marcas =
             onClose={onClose}
             onSave={onSave}
             submitError={submitError}
+            isSubmitting={isSubmitting}
           />
         </div>
       </div>

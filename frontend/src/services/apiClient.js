@@ -29,7 +29,7 @@ const FALLBACK_MESSAGES = {
   403: 'No tenés permisos para realizar esta acción.',
   404: 'No se encontró el recurso solicitado.',
   409: 'No se puede completar la operación porque hay datos relacionados.',
-  500: 'Ocurrió un error en el servidor. Si estás duplicando un código o nombre que ya existe, cambiá el valor e intentá de nuevo.',
+  500: 'Se produjo un error en el servidor.',
 };
 
 function extractErrorMessage(payload, status) {
@@ -91,10 +91,7 @@ async function request(method, path, body) {
         401
       );
     }
-    throw buildError(
-      `${extractErrorMessage(payload, response.status)} (HTTP ${response.status})`,
-      response.status
-    );
+    throw buildError(extractErrorMessage(payload, response.status), response.status);
   }
 
   return payload;

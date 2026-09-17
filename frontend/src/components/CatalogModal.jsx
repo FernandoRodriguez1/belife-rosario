@@ -9,6 +9,7 @@ function CatalogModal({
   onClose,
   onSave,
   submitError = '',
+  isSubmitting = false,
 }) {
   const isEditing = Boolean(item);
   const [nombre, setNombre] = useState(item?.nombre ?? '');
@@ -95,10 +96,10 @@ function CatalogModal({
                 {submitError}
               </p>
             )}
-            <Button type="button" variant="secondary" onClick={onClose}>
+            <Button type="button" variant="secondary" onClick={onClose} disabled={isSubmitting}>
               Cancelar
             </Button>
-            <Button type="submit">
+            <Button type="submit" loading={isSubmitting}>
               {isEditing ? 'Guardar cambios' : 'Guardar'}
             </Button>
           </div>

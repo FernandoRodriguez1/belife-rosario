@@ -321,7 +321,7 @@ export function useSales(products, refreshProducts) {
 
   const confirmSale = useCallback(
     async (formaPago) => {
-      if (cart.length === 0 || isConfirming) return false;
+      if (cart.length === 0 || isConfirming) return { ok: false, error: null };
 
       for (const item of cart) {
         const product = products.find((p) => p.id === item.id);
@@ -332,7 +332,7 @@ export function useSales(products, refreshProducts) {
           setCartError(
             `Stock insuficiente de "${item.nombre}". Revisá el carrito antes de confirmar.`
           );
-          return false;
+          return { ok: false, error: null };
         }
       }
 
@@ -367,10 +367,10 @@ export function useSales(products, refreshProducts) {
         setCartError('');
         await refreshVentas();
         await refreshProducts();
-        return true;
+        return { ok: true };
       } catch (err) {
         setCartError(err.message);
-        return false;
+        return { ok: false, error: err.message };
       } finally {
         setIsConfirming(false);
       }
@@ -396,6 +396,7 @@ export function useSales(products, refreshProducts) {
     cartItemCount,
     cartEmpty,
     cartError,
+    isConfirming,
     ventas,
     isLoading,
     error,
