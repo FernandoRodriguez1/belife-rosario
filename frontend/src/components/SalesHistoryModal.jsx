@@ -142,7 +142,7 @@ function SalesHistoryModal({ ventas, isLoading = false, error = '', onClose, onD
       className="fixed inset-0 z-50 flex items-start justify-center bg-gray-900/40 p-4 sm:items-center"
     >
       <div
-        className="flex max-h-[90vh] w-full max-w-2xl flex-col rounded-3xl bg-white shadow-xl"
+        className="flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl bg-white shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4 sm:px-6">
@@ -163,7 +163,7 @@ function SalesHistoryModal({ ventas, isLoading = false, error = '', onClose, onD
           </button>
         </div>
 
-        <div className="px-5 py-6 sm:px-6">
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-6 sm:px-6">
           <div className="mb-5 flex flex-wrap items-end gap-3">
             <label className="flex flex-col gap-1 text-xs font-medium text-gray-500">
               Desde
