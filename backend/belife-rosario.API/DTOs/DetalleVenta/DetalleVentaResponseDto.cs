@@ -8,11 +8,11 @@ public class DetalleVentaResponseDto
 
     public int VentaId { get; set; }
 
-    public int ProductoId { get; set; }
+    public int? ProductoId { get; set; }
 
-    public string ProductoNombre { get; set; } = null!;
+    public string? ProductoNombre { get; set; }
 
-    public UnidadMedida UnidadMedida { get; set; }
+    public UnidadMedida? UnidadMedida { get; set; }
 
     public UnidadPrecio? UnidadPrecio { get; set; }
 

@@ -49,6 +49,25 @@ public class VentaController : ControllerBase
         return Ok(MapToResponse(venta));
     }
 
+    [HttpGet("producto/{productoId:int}")]
+    public async Task<ActionResult<IEnumerable<VentaResponseDto>>> GetVentasPorProducto(int productoId)
+    {
+        var productoExiste = await _context.Productos.AnyAsync(p => p.Id == productoId);
+
+        if (!productoExiste)
+            return NotFound();
+
+        var ventas = await _context.Ventas
+            .AsNoTracking()
+            .Where(v => v.Detalles.Any(d => d.ProductoId == productoId))
+            .Include(v => v.Detalles)
+                .ThenInclude(d => d.Producto)
+            .OrderByDescending(v => v.FechaHora)
+            .ToListAsync();
+
+        return Ok(ventas.Select(MapToResponse).ToList());
+    }
+
     [HttpPost]
     public async Task<ActionResult<VentaResponseDto>> CreateVenta(CreateVentaDto dto)
     {
@@ -82,6 +101,7 @@ public class VentaController : ControllerBase
             venta.Detalles.Add(new DetalleVenta
             {
                 ProductoId = detalleDto.ProductoId,
+                ProductoNombre = producto.Nombre,
                 Cantidad = detalleDto.Cantidad,
                 PrecioUnitario = detalleDto.PrecioUnitario,
                 Subtotal = subtotal
@@ -154,9 +174,9 @@ public class VentaController : ControllerBase
                 Id = d.Id,
                 VentaId = d.VentaId,
                 ProductoId = d.ProductoId,
-                ProductoNombre = d.Producto.Nombre,
-                UnidadMedida = d.Producto.UnidadMedida,
-                UnidadPrecio = d.Producto.UnidadPrecio,
+                ProductoNombre = d.ProductoNombre ?? d.Producto?.Nombre,
+                UnidadMedida = d.Producto?.UnidadMedida,
+                UnidadPrecio = d.Producto?.UnidadPrecio,
                 Cantidad = d.Cantidad,
                 PrecioUnitario = d.PrecioUnitario,
                 Subtotal = d.Subtotal
