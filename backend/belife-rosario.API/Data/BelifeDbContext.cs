@@ -344,7 +344,11 @@ public class BelifeDbContext : DbContext
 
             entity.Property(d => d.ProductoId)
                 .HasColumnName("producto_id")
-                .IsRequired();
+                .IsRequired(false);
+
+            entity.Property(d => d.ProductoNombre)
+                .HasColumnName("producto_nombre")
+                .HasMaxLength(150);
 
             entity.Property(d => d.Cantidad)
                 .HasColumnName("cantidad")
@@ -374,7 +378,7 @@ public class BelifeDbContext : DbContext
             entity.HasOne(d => d.Producto)
                 .WithMany(p => p.DetallesVenta)
                 .HasForeignKey(d => d.ProductoId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.SetNull);
         });
     }
 
