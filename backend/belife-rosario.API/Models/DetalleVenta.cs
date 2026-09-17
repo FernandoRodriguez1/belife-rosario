@@ -6,7 +6,7 @@ public class DetalleVenta
 
     public int VentaId { get; set; }
 
-    public int ProductoId { get; set; }
+    public int? ProductoId { get; set; }
 
     public int Cantidad { get; set; }
 
@@ -15,7 +15,10 @@ public class DetalleVenta
 
     public decimal Subtotal { get; set; }
 
+    // Snapshot del nombre del producto al momento de la venta
+    public string? ProductoNombre { get; set; }
+
     public Venta Venta { get; set; } = null!;
 
-    public Producto Producto { get; set; } = null!;
+    public Producto? Producto { get; set; }
 }

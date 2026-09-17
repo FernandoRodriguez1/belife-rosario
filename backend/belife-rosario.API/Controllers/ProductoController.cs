@@ -173,15 +173,7 @@ public class ProductoController : ControllerBase
             return NotFound();
 
         _context.Productos.Remove(producto);
-
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateException)
-        {
-            return Conflict("No se puede eliminar el producto porque tiene ventas asociadas.");
-        }
+        await _context.SaveChangesAsync();
 
         return NoContent();
     }
