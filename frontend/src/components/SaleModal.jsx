@@ -6,8 +6,10 @@ import { formatCurrency } from '../utils/formatCurrency';
 import { FORMA_PAGO_OPTIONS } from '../utils/formaPago';
 import {
   esModoKilos,
+  esModoCienGrados,
   aKilos,
   PASO_KILOGRAMOS,
+  PASO_CIEN_GRAMOS,
 } from '../utils/unidadPrecio';
 
 const SUFIJOS_STOCK = { Gramos: 'g', Unidad: 'u.' };
@@ -145,7 +147,10 @@ function SaleModal({
                           {esModoKilos(
                             product.unidad_medida,
                             product.unidad_precio
-                          ) && ' /kg'}{' '}
+                          ) ? ' /kg' : esModoCienGrados(
+                            product.unidad_medida,
+                            product.unidad_precio
+                          ) ? ' c/100g' : ''}{' '}
                           ·{' '}
                           <span
                             className={
@@ -212,10 +217,17 @@ function SaleModal({
                       item.unidad_medida,
                       item.unidad_precio
                     );
-                    const minima = modoKilos ? PASO_KILOGRAMOS : 1;
+                    const modoCienGrados = esModoCienGrados(
+                      item.unidad_medida,
+                      item.unidad_precio
+                    );
+                    const esUnidad = item.unidad_medida === 'Unidad';
+                    const minima = modoKilos ? PASO_KILOGRAMOS : modoCienGrados ? PASO_CIEN_GRAMOS : 1;
                     const paso = modoKilos
                       ? String(PASO_KILOGRAMOS)
-                      : '1';
+                      : modoCienGrados
+                        ? String(PASO_CIEN_GRAMOS)
+                        : '1';
                     return (
                       <li
                         key={item.id}
@@ -231,11 +243,13 @@ function SaleModal({
                                 ? `${formatCurrency(
                                     item.precio_actual
                                   )}/kg`
-                                : `${formatCurrency(
-                                    item.precio_actual
-                                  )} c/${
-                                    PER_UNIDAD[item.unidad_medida] ?? 'u'
-                                  }`}
+                                : modoCienGrados
+                                  ? `${formatCurrency(item.precio_actual)} c/100g`
+                                  : `${formatCurrency(
+                                      item.precio_actual
+                                    )} c/${
+                                      PER_UNIDAD[item.unidad_medida] ?? 'u'
+                                    }`}
                             </p>
                           </div>
                           <button
@@ -263,16 +277,22 @@ function SaleModal({
                               type="number"
                               min={minima}
                               step={paso}
+                              inputMode={esUnidad ? 'numeric' : 'decimal'}
                               value={
                                 draftCantidades[item.id] ??
                                 String(item.cantidad)
                               }
-                              onChange={(e) =>
+                              onChange={(e) => {
+                                let value = e.target.value;
+                                // Para unidades: solo permitir dígitos (enteros)
+                                if (esUnidad) {
+                                  value = value.replace(/[^0-9]/g, '');
+                                }
                                 setDraftCantidades((prev) => ({
                                   ...prev,
-                                  [item.id]: e.target.value,
-                                }))
-                              }
+                                  [item.id]: value,
+                                }));
+                              }}
                               onBlur={(e) =>
                                 commitCantidad(item.id, e.target.value)
                               }

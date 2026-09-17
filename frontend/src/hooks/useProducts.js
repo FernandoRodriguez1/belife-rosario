@@ -10,9 +10,13 @@ import { stockEnUnidadDePrecio } from '../utils/unidadPrecio';
 
 // El backend no expone "stock_minimo" (no existe en su esquema). El valor se
 // resuelve desde localStorage (ver utils/stockMinimoStorage.js) con un default
-// según la unidad de medida: 5 si es "Unidad", 500 si es "Gramos".
+// según la unidad de medida y unidad de precio:
+// - Unidad: 5
+// - Gramos + Por-Kilo: 1000 (1kg)
+// - Gramos + Por-100-Gramos / sin precio: 500
 function normalizarProducto(p) {
   const unidadMedida = p.unidadMedida ?? 'Gramos';
+  const unidadPrecio = p.unidadPrecio ?? null;
   return {
     id: p.id,
     codigo: p.codigo ?? '',
@@ -23,14 +27,14 @@ function normalizarProducto(p) {
     marca_nombre: p.marcaNombre,
     precio_actual: Number(p.precioActual),
     stock: Number(p.stock),
-    stock_minimo: obtenerStockMinimo(p.id, unidadMedida),
+    stock_minimo: obtenerStockMinimo(p.id, unidadMedida, unidadPrecio),
     estado: p.estado ? 'activo' : 'inactivo',
     // unidadMedida viaja como string ("Gramos" | "Unidad"). Los productos
     // creados antes de este campo se guardaron con el default "Gramos".
     unidad_medida: unidadMedida,
     // unidadPrecio viaja como string ("Por-Kilo" | "Por-100-Gramos") o null
     // cuando la unidad de medida es "Unidad" (no aplica).
-    unidad_precio: p.unidadPrecio ?? null,
+    unidad_precio: unidadPrecio,
   };
 }
 

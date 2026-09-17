@@ -1,10 +1,11 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { Layers, Tag } from 'lucide-react';
 import AuthProvider from './components/AuthProvider';
 import ProtectedRoute from './components/ProtectedRoute';
 import LoginPage from './pages/LoginPage';
 import ProductsPage from './pages/ProductsPage';
-import CategoriasPage from './pages/CategoriasPage';
-import MarcasPage from './pages/MarcasPage';
+import CatalogPage from './pages/CatalogPage';
+import { categoriasService, marcasService } from './services/catalogService';
 
 function App() {
   return (
@@ -24,7 +25,14 @@ function App() {
             path="/categorias"
             element={
               <ProtectedRoute>
-                <CategoriasPage />
+                <CatalogPage
+                  title="Categorías"
+                  icon={Layers}
+                  labelSingular="categoría"
+                  service={categoriasService}
+                  emptyMessage="Aún no hay categorías. Creá la primera."
+                  productLabel="Productos"
+                />
               </ProtectedRoute>
             }
           />
@@ -32,7 +40,14 @@ function App() {
             path="/marcas"
             element={
               <ProtectedRoute>
-                <MarcasPage />
+                <CatalogPage
+                  title="Marcas"
+                  icon={Tag}
+                  labelSingular="marca"
+                  service={marcasService}
+                  emptyMessage="Aún no hay marcas. Creá la primera."
+                  productLabel="Productos"
+                />
               </ProtectedRoute>
             }
           />

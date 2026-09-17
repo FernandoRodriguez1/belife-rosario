@@ -5,6 +5,7 @@ const BASE = '/api/ventas';
 export const ventasService = {
   getAll: () => apiClient.get(BASE),
   getById: (id) => apiClient.get(`${BASE}/${id}`),
+  getByProducto: (productoId) => apiClient.get(`${BASE}/producto/${productoId}`),
   // Body esperado por el backend: { formaPago, detalles: [{ productoId,
   // cantidad, precioUnitario }] }. El stock se descuenta del lado del servidor.
   create: (data) => apiClient.post(BASE, data),

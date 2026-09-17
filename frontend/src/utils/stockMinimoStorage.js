@@ -15,12 +15,7 @@
 // este archivo. No reutilizar para otros datos.
 // ============================================================================
 
-// Default según la escala de la unidad de medida: en un almacén/dietética 5
-// unidades es poco stock, pero 5 gramos es prácticamente nada; 500 gramos es
-// un umbral más razonable.
-export function obtenerStockMinimoPorUnidad(unidadMedida) {
-  return unidadMedida === 'Gramos' ? 500 : 5;
-}
+import { getDefaultStockMinimo } from './unidadPrecio';
 
 function keyParaProducto(productoId) {
   return `stock_minimo_producto_${productoId}`;
@@ -39,7 +34,7 @@ export function guardarStockMinimo(productoId, valor) {
   }
 }
 
-export function obtenerStockMinimo(productoId, unidadMedida) {
+export function obtenerStockMinimo(productoId, unidadMedida, unidadPrecio) {
   try {
     const guardado = localStorage.getItem(keyParaProducto(productoId));
     if (guardado !== null) {
@@ -49,7 +44,7 @@ export function obtenerStockMinimo(productoId, unidadMedida) {
   } catch {
     // si no hay acceso a localStorage, caemos al default.
   }
-  return obtenerStockMinimoPorUnidad(unidadMedida);
+  return getDefaultStockMinimo(unidadMedida, unidadPrecio);
 }
 
 export function eliminarStockMinimo(productoId) {
@@ -59,3 +54,6 @@ export function eliminarStockMinimo(productoId) {
     // ignorar fallos de localStorage.
   }
 }
+
+// Re-export para compatibilidad con código existente
+export { getDefaultStockMinimo } from './unidadPrecio';

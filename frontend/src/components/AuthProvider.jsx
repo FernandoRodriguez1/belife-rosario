@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
+import { jwtDecode } from 'jwt-decode';
 import { AuthContext } from '../hooks/useAuth';
 import { authService } from '../services/authService';
 import { administradoresService } from '../services/administradoresService';
@@ -7,32 +8,6 @@ import {
   TOKEN_EXPIRATION_KEY,
   TOKEN_KEY,
 } from '../services/config';
-
-/**
- * SUPUESTOS sobre el payload del JWT (para verificar juntos después):
- * El backend (Services/TokenService.cs) genera claims con los tipos .NET
- * ClaimTypes.NameIdentifier => corto "nameid" (id del admin) y ClaimTypes.Name
- * => corto "unique_name" (nombre del admin). Por eso acá se intenta leer
- * "nameid"/"unique_name" además de "sub"/"nombre"/"usuario"/"id". El claim
- * "exp" (expiracion) viene en formato unix timestamp.
- */
-
-function decodeJwtPayload(token) {
-  if (!token || typeof token !== 'string') return null;
-  try {
-    const segment = token.split('.')[1];
-    if (!segment) return null;
-    const base64 = segment.replace(/-/g, '+').replace(/_/g, '/');
-    const padded = base64.padEnd(
-      base64.length + ((4 - (base64.length % 4)) % 4),
-      '='
-    );
-    return JSON.parse(atob(padded));
-  } catch (err) {
-    console.warn('[AUTH] No se pudo decodificar el payload del JWT:', err);
-    return null;
-  }
-}
 
 function extractAdminFromPayload(payload) {
   if (!payload) return null;
@@ -69,7 +44,13 @@ function leerSesionGuardada() {
     }
   }
 
-  return extractAdminFromPayload(decodeJwtPayload(token));
+  try {
+    const decoded = jwtDecode(token);
+    return extractAdminFromPayload(decoded);
+  } catch (err) {
+    console.warn('[AUTH] No se pudo decodificar el payload del JWT:', err);
+    return null;
+  }
 }
 
 export function AuthProvider({ children }) {
@@ -86,12 +67,16 @@ export function AuthProvider({ children }) {
     let admin = session.administrador;
 
     if (!admin) {
-      const decoded = decodeJwtPayload(session.token);
-      console.warn(
-        '[AUTH] El login no devolvió el objeto administrador; usando el payload del JWT:',
-        decoded
-      );
-      admin = extractAdminFromPayload(decoded);
+      try {
+        const decoded = jwtDecode(session.token);
+        console.warn(
+          '[AUTH] El login no devolvió el objeto administrador; usando el payload del JWT:',
+          decoded
+        );
+        admin = extractAdminFromPayload(decoded);
+      } catch (err) {
+        console.warn('[AUTH] No se pudo decodificar el JWT:', err);
+      }
     }
 
     if (!admin || !admin.nombre) {

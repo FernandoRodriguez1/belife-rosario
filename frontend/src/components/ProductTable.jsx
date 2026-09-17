@@ -1,17 +1,23 @@
 import { AlertTriangle, History, Package, Pencil, Trash2 } from 'lucide-react';
 import Badge from './Badge';
-import { formatCurrency } from '../utils/formatCurrency';
 import { esStockBajo } from '../utils/stockAlerts';
+import { formatStockDisplay, formatPriceWithUnit } from '../utils/unidadPrecio';
 
 const estadoIndicator = (estado) =>
   estado === 'activo'
     ? { dot: 'bg-green-500', label: 'Activo', text: 'text-gray-700' }
     : { dot: 'bg-gray-300', label: 'Inactivo', text: 'text-gray-400' };
 
-const STOCK_SUFFIX = { Gramos: 'g', Unidad: 'u.' };
-
 const marcaBadgeClass =
   'inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset bg-gray-100 text-gray-600 ring-gray-500/20';
+
+function formatPriceCell(product) {
+  return formatPriceWithUnit(product.precio_actual, product.unidad_medida, product.unidad_precio);
+}
+
+function formatStockCell(product) {
+  return formatStockDisplay(product.stock, product.unidad_medida, product.unidad_precio);
+}
 
 function ProductTable({ products, onEdit, onDelete, onHistory }) {
   if (products.length === 0) {
@@ -66,7 +72,6 @@ function ProductTable({ products, onEdit, onDelete, onHistory }) {
               const marca = product.marca_nombre ?? 'Sin marca';
               const estado = estadoIndicator(product.estado);
               const lowStock = esStockBajo(product);
-              const stockSuffix = STOCK_SUFFIX[product.unidad_medida] ?? 'u.';
               return (
                 <tr
                   key={product.id}
@@ -110,19 +115,19 @@ function ProductTable({ products, onEdit, onDelete, onHistory }) {
                     </span>
                   </td>
                   <td className="whitespace-nowrap px-2 py-3 font-display text-xs font-semibold text-gray-900 sm:px-4 sm:py-4 sm:text-sm">
-                    {formatCurrency(product.precio_actual)}
+                    {formatPriceCell(product)}
                   </td>
                   <td className="whitespace-nowrap px-2 py-3 sm:px-4 sm:py-4">
                     {lowStock ? (
                       <span className="inline-flex items-center gap-1.5">
                         <AlertTriangle className="hidden size-3.5 text-red-600 sm:inline sm:size-4" />
                         <span className="rounded-full bg-red-100 px-1.5 text-xs font-semibold text-red-700 sm:px-2.5 sm:py-1 sm:text-sm">
-                          {product.stock} {stockSuffix}
+                          {formatStockCell(product)}
                         </span>
                       </span>
                     ) : (
                       <span className="text-xs font-medium text-gray-900 sm:text-sm">
-                        {product.stock} {stockSuffix}
+                        {formatStockCell(product)}
                       </span>
                     )}
                   </td>

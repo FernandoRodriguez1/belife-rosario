@@ -5,7 +5,7 @@ import StatsCards from '../components/StatsCards';
 import SearchBar from '../components/SearchBar';
 import ProductTable from '../components/ProductTable';
 import ProductModal from '../components/ProductModal';
-import ConfirmDialog from '../components/ConfirmDialog';
+import DeleteProductConfirmDialog from '../components/DeleteProductConfirmDialog';
 import PriceHistoryModal from '../components/PriceHistoryModal';
 import SaleModal from '../components/SaleModal';
 import SalesHistoryModal from '../components/SalesHistoryModal';
@@ -13,6 +13,8 @@ import Button from '../components/Button';
 import { useProducts } from '../hooks/useProducts';
 import { usePriceHistory } from '../hooks/usePriceHistory';
 import { useSales } from '../hooks/useSales';
+import { useApi } from '../hooks/useApi';
+import { categoriasService, marcasService } from '../services/catalogService';
 
 function ProductsPage() {
   const {
@@ -41,6 +43,9 @@ function ProductsPage() {
     error: historyError,
   } = usePriceHistory();
   const sales = useSales(allProducts, refreshProducts);
+
+  const { data: categorias } = useApi(categoriasService);
+  const { data: marcas } = useApi(marcasService);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
@@ -209,6 +214,8 @@ function ProductsPage() {
           key={editingProduct ? editingProduct.id : 'new'}
           product={editingProduct}
           products={allProducts}
+          categorias={categorias}
+          marcas={marcas}
           submitError={modalError}
           onClose={() => {
             setModalOpen(false);
@@ -230,10 +237,8 @@ function ProductsPage() {
       )}
 
       {productToDelete && (
-        <ConfirmDialog
-          title="Eliminar producto"
-          message={`¿Estás seguro de que querés eliminar "${productToDelete.nombre}"? Esta acción no se puede deshacer.`}
-          confirmLabel="Eliminar"
+        <DeleteProductConfirmDialog
+          product={productToDelete}
           onConfirm={handleConfirmDelete}
           onCancel={() => setProductToDelete(null)}
         />
