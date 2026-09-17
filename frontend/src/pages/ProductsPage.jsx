@@ -31,6 +31,8 @@ function ProductsPage() {
     setQuery,
     sortBy,
     setSortBy,
+    sortDir,
+    setSortDir,
     onlyLowStock,
     setOnlyLowStock,
   } = useProducts();
@@ -104,7 +106,7 @@ function ProductsPage() {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
+      <div className="min-h-[44rem] space-y-6">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h1 className="font-display text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
@@ -146,6 +148,10 @@ function ProductsPage() {
           onQueryChange={setQuery}
           sortBy={sortBy}
           onSortChange={setSortBy}
+          sortDir={sortDir}
+          onSortDirChange={() =>
+            setSortDir((prev) => (prev === 'asc' ? 'desc' : 'asc'))
+          }
           onNewProduct={openNewProduct}
           onNewSale={() => setSaleOpen(true)}
           onlyLowStock={onlyLowStock}
@@ -176,6 +182,7 @@ function ProductsPage() {
           ventas={sales.ventas}
           isLoading={sales.isLoading}
           error={sales.error}
+          onDelete={sales.eliminarVenta}
           onClose={() => setSalesHistoryOpen(false)}
         />
       )}

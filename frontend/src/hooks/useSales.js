@@ -3,15 +3,23 @@ import { ventasService } from '../services/ventasService';
 import {
   calcularSubtotal,
   calcularTotalCarrito,
-  calcularCantidadItems,
   hayStockDisponible,
 } from '../utils/saleCalculations';
+import {
+  esModoKilos,
+  aKilos,
+  aGramos,
+  redondearKilos,
+  GRAMOS_POR_KILO,
+  PASO_KILOGRAMOS,
+} from '../utils/unidadPrecio';
 
 function normalizarDetalle(d) {
   return {
     producto_id: d.productoId,
     nombre: d.productoNombre,
     unidad_medida: d.unidadMedida ?? null,
+    unidad_precio: d.unidadPrecio ?? null,
     cantidad: d.cantidad,
     precio_unitario: Number(d.precioUnitario),
     subtotal: Number(d.subtotal),
@@ -75,11 +83,21 @@ export function useSales(products, refreshProducts) {
   const addToCart = useCallback(
     (product) => {
       const existing = cart.find((item) => item.id === product.id);
-      const nextCantidad = (existing ? existing.cantidad : 0) + 1;
+      // En modo kilos (Gramos + Por-Kilo) el carrito opera en KG (paso 0.1);
+      // el resto de los productos en su unidad natural (gramos o unidades).
+      const modoKilos = esModoKilos(product.unidad_medida, product.unidad_precio);
+      const paso = modoKilos ? PASO_KILOGRAMOS : 1;
+      const nextCantidad = existing
+        ? modoKilos
+          ? redondearKilos(existing.cantidad + paso)
+          : existing.cantidad + paso
+        : paso;
+      // La validación de stock siempre compara en gramos (unidad del backend).
+      const cantidadGramos = modoKilos ? aGramos(nextCantidad) : nextCantidad;
 
-      if (!hayStockDisponible(product.stock, nextCantidad)) {
+      if (!hayStockDisponible(product.stock, cantidadGramos)) {
         setCartError(
-          `No hay stock suficiente de "${product.nombre}" para agregar más unidades.`
+          `No hay stock suficiente de "${product.nombre}" para agregar más.`
         );
         return;
       }
@@ -103,8 +121,8 @@ export function useSales(products, refreshProducts) {
               ...cart,
               {
                 ...product,
-                cantidad: 1,
-                subtotal: calcularSubtotal(product.precio_actual, 1),
+                cantidad: nextCantidad,
+                subtotal: calcularSubtotal(product.precio_actual, nextCantidad),
               },
             ]
       );
@@ -117,10 +135,18 @@ export function useSales(products, refreshProducts) {
       const item = cart.find((i) => i.id === productId);
       if (!item) return;
 
-      const nextCantidad = item.cantidad + 1;
-      if (!hayStockDisponible(item.stock, nextCantidad)) {
+      const modoKilos = esModoKilos(item.unidad_medida, item.unidad_precio);
+      const paso = modoKilos ? PASO_KILOGRAMOS : 1;
+      const nextCantidad = modoKilos
+        ? redondearKilos(item.cantidad + paso)
+        : item.cantidad + paso;
+      const cantidadGramos = modoKilos ? aGramos(nextCantidad) : nextCantidad;
+
+      if (!hayStockDisponible(item.stock, cantidadGramos)) {
         setCartError(
-          `Stock insuficiente de "${item.nombre}": máximo ${item.stock} unidades.`
+          `Stock insuficiente de "${item.nombre}": máximo ${
+            modoKilos ? `${aKilos(item.stock)} kg` : `${item.stock} unidades`
+          }.`
         );
         return;
       }
@@ -141,32 +167,41 @@ export function useSales(products, refreshProducts) {
     [cart]
   );
 
-  const decrementQuantity = useCallback(
-    (productId) => {
-      setCartError('');
-      setCart(
-        cart.map((item) =>
-          item.id === productId && item.cantidad > 1
-            ? {
-                ...item,
-                cantidad: item.cantidad - 1,
-                subtotal: calcularSubtotal(item.precio_actual, item.cantidad - 1),
-              }
-            : item
-        )
-      );
-    },
-    [cart]
-  );
+  const decrementQuantity = useCallback((productId) => {
+    setCartError('');
+    setCart((prev) =>
+      prev.map((item) => {
+        if (item.id !== productId) return item;
+
+        const modoKilos = esModoKilos(item.unidad_medida, item.unidad_precio);
+        const minima = modoKilos ? PASO_KILOGRAMOS : 1;
+        if (item.cantidad <= minima) return item;
+
+        const paso = modoKilos ? PASO_KILOGRAMOS : 1;
+        const nextCantidad = modoKilos
+          ? redondearKilos(item.cantidad - paso)
+          : item.cantidad - paso;
+
+        return {
+          ...item,
+          cantidad: nextCantidad,
+          subtotal: calcularSubtotal(item.precio_actual, nextCantidad),
+        };
+      })
+    );
+  }, []);
 
   // Permite setear la cantidad directamente (input editable del carrito).
-  // Valida contra el stock disponible y la cota mínima (1): si llega a 0 o a
-  // un valor inválido vacío, el ítem se quita del carrito para no dejar un
-  // valor inconsistente.
+  // Valida contra el stock disponible y la cota mínima (0.1 kg en modo kilos,
+  // 1 en el resto): si llega a 0 o a un valor inválido vacío, el ítem se quita
+  // del carrito para no dejar un valor inconsistente.
   const setQuantity = useCallback(
     (productId, cantidad) => {
       const item = cart.find((i) => i.id === productId);
       if (!item) return;
+
+      const modoKilos = esModoKilos(item.unidad_medida, item.unidad_precio);
+      const minima = modoKilos ? PASO_KILOGRAMOS : 1;
 
       const numero = Number(cantidad);
       if (!Number.isFinite(numero)) {
@@ -176,15 +211,22 @@ export function useSales(products, refreshProducts) {
         return;
       }
 
-      if (numero < 1) {
+      if (numero < minima) {
         setCartError('');
         setCart(cart.filter((i) => i.id !== productId));
         return;
       }
 
-      if (!hayStockDisponible(item.stock, numero)) {
+      const cantidadFinal = modoKilos ? redondearKilos(numero) : numero;
+      // Validación de stock SIEMPRE en gramos (unidad del backend): el modo
+      // kilos carga en kg pero el stock del backend está en gramos.
+      const cantidadGramos = modoKilos ? aGramos(cantidadFinal) : cantidadFinal;
+
+      if (!hayStockDisponible(item.stock, cantidadGramos)) {
         setCartError(
-          `Stock insuficiente de "${item.nombre}": máximo ${item.stock} unidades.`
+          `Stock insuficiente de "${item.nombre}": máximo ${
+            modoKilos ? `${aKilos(item.stock)} kg` : `${item.stock} unidades`
+          }.`
         );
         return;
       }
@@ -195,8 +237,8 @@ export function useSales(products, refreshProducts) {
           i.id === productId
             ? {
                 ...i,
-                cantidad: numero,
-                subtotal: calcularSubtotal(i.precio_actual, numero),
+                cantidad: cantidadFinal,
+                subtotal: calcularSubtotal(i.precio_actual, cantidadFinal),
               }
             : i
         )
@@ -224,7 +266,10 @@ export function useSales(products, refreshProducts) {
 
       for (const item of cart) {
         const product = products.find((p) => p.id === item.id);
-        if (!product || !hayStockDisponible(product.stock, item.cantidad)) {
+        const modoKilos = esModoKilos(item.unidad_medida, item.unidad_precio);
+        // Validación de stock SIEMPRE en gramos (unidad del backend).
+        const cantidadGramos = modoKilos ? aGramos(item.cantidad) : item.cantidad;
+        if (!product || !hayStockDisponible(product.stock, cantidadGramos)) {
           setCartError(
             `Stock insuficiente de "${item.nombre}". Revisá el carrito antes de confirmar.`
           );
@@ -234,14 +279,23 @@ export function useSales(products, refreshProducts) {
 
       // PAYLOAD POST /api/ventas (según CreateVentaDto/CreateDetalleVentaDto del
       // backend): { formaPago, detalles: [{ productoId, cantidad,
-      // precioUnitario }] }. El stock se descuenta en el servidor. formaPago es
-      // el número del enum (Efectivo=0, Debito=1, Credito=2, Transferencia=3,
+      // precioUnitario }] }. El backend calcula Subtotal = Cantidad *
+      // PrecioUnitario y descuenta el stock EN GRAMOS (Cantidad es int). Por
+      // eso en modo kilos la cantidad se envía en gramos (kg * 1000) y el
+      // PrecioUnitario prorrateado por gramo (precio por kilo / 1000): así el
+      // Subtotal del servidor coincide con el del carrito. formaPago es el
+      // número del enum (Efectivo=0, Debito=1, Credito=2, Transferencia=3,
       // Otro=4).
-      const detalles = cart.map((item) => ({
-        productoId: item.id,
-        cantidad: item.cantidad,
-        precioUnitario: item.precio_actual,
-      }));
+      const detalles = cart.map((item) => {
+        const modoKilos = esModoKilos(item.unidad_medida, item.unidad_precio);
+        return {
+          productoId: item.id,
+          cantidad: modoKilos ? aGramos(item.cantidad) : item.cantidad,
+          precioUnitario: modoKilos
+            ? item.precio_actual / GRAMOS_POR_KILO
+            : item.precio_actual,
+        };
+      });
 
       setIsConfirming(true);
       try {
@@ -262,8 +316,16 @@ export function useSales(products, refreshProducts) {
   );
 
   const cartTotal = useMemo(() => calcularTotalCarrito(cart), [cart]);
-  const cartItemCount = useMemo(() => calcularCantidadItems(cart), [cart]);
+  const cartItemCount = cart.length;
   const cartEmpty = cart.length === 0;
+
+  // DELETE /api/ventas/{id}: el backend NO devuelve el stock de los productos
+  // vendidos. Solo se remueve la venta del estado local (sin recargar todo el
+  // historial). Si falla, el error se propaga para que el modal lo muestre.
+  const eliminarVenta = useCallback(async (id) => {
+    await ventasService.remove(id);
+    setVentas((prev) => prev.filter((v) => v.id !== id));
+  }, []);
 
   return {
     cart,
@@ -275,6 +337,7 @@ export function useSales(products, refreshProducts) {
     isLoading,
     error,
     refreshVentas,
+    eliminarVenta,
     addToCart,
     incrementQuantity,
     decrementQuantity,

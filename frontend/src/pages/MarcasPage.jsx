@@ -68,7 +68,7 @@ function MarcasPage() {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
+      <div className="min-h-[32rem] space-y-6">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h1 className="font-display text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">

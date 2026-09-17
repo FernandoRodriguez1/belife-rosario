@@ -12,7 +12,7 @@ function AdminLayout({ children }) {
           <Header />
         </div>
         <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
-          <div className="rounded-2xl bg-white/90 p-5 shadow-sm backdrop-blur-sm sm:p-8">
+          <div className="relative rounded-2xl bg-white/90 p-5 shadow-sm backdrop-blur-sm sm:p-8">
             {children}
           </div>
         </main>

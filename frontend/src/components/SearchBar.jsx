@@ -1,4 +1,12 @@
-import { AlertTriangle, ArrowDownWideNarrow, Plus, Search, ShoppingCart } from 'lucide-react';
+import {
+  AlertTriangle,
+  ArrowDown,
+  ArrowDownWideNarrow,
+  ArrowUp,
+  Plus,
+  Search,
+  ShoppingCart,
+} from 'lucide-react';
 import Button from './Button';
 
 function SearchBar({
@@ -6,6 +14,8 @@ function SearchBar({
   onQueryChange,
   sortBy,
   onSortChange,
+  sortDir,
+  onSortDirChange,
   onNewProduct,
   onNewSale,
   onlyLowStock,
@@ -44,6 +54,23 @@ function SearchBar({
             <option value="stock">Stock</option>
           </select>
         </div>
+        <Button
+          variant="secondary"
+          onClick={onSortDirChange}
+          title={
+            sortDir === 'asc'
+              ? 'Ordenar descendente'
+              : 'Ordenar ascendente'
+          }
+          className="w-full sm:w-auto"
+        >
+          {sortDir === 'asc' ? (
+            <ArrowUp className="size-4" />
+          ) : (
+            <ArrowDown className="size-4" />
+          )}
+          {sortDir === 'asc' ? 'Ascendente' : 'Descendente'}
+        </Button>
         <Button
           variant="secondary"
           onClick={onNewSale}

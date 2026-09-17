@@ -1,4 +1,5 @@
 import { X } from 'lucide-react';
+import { createPortal } from 'react-dom';
 import { formatCurrency } from '../utils/formatCurrency';
 
 const formatFecha = (iso) => {
@@ -8,12 +9,12 @@ const formatFecha = (iso) => {
 };
 
 function PriceHistoryModal({ product, history, isLoading = false, error = '', onClose }) {
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-gray-900/40 p-4 sm:items-center"
+      className="fixed inset-0 z-50 flex items-start justify-center bg-gray-900/40 p-4 sm:items-center"
     >
       <div
-        className="my-8 w-full max-w-lg rounded-3xl bg-white shadow-xl"
+        className="flex max-h-[90vh] w-full max-w-lg flex-col rounded-3xl bg-white shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4 sm:px-6">
@@ -82,7 +83,8 @@ function PriceHistoryModal({ product, history, isLoading = false, error = '', on
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

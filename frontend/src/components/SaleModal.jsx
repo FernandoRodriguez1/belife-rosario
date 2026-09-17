@@ -1,8 +1,14 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Minus, Plus, Search, ShoppingCart, Trash2, X } from 'lucide-react';
 import Button from './Button';
 import { formatCurrency } from '../utils/formatCurrency';
 import { FORMA_PAGO_OPTIONS } from '../utils/formaPago';
+import {
+  esModoKilos,
+  aKilos,
+  PASO_KILOGRAMOS,
+} from '../utils/unidadPrecio';
 
 const SUFIJOS_STOCK = { Gramos: 'g', Unidad: 'u.' };
 const PER_UNIDAD = { Gramos: 'g', Unidad: 'u' };
@@ -54,15 +60,15 @@ function SaleModal({
   const side = 'rounded-l-full';
   const sideRight = 'rounded-r-full';
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-gray-900/40 p-4 sm:items-center"
+      className="fixed inset-0 z-50 flex items-start justify-center bg-gray-900/40 p-4 sm:items-center"
     >
       <div
-        className="my-8 w-full max-w-3xl rounded-3xl bg-white shadow-xl"
+        className="flex max-h-[90vh] w-full max-w-3xl flex-col rounded-3xl bg-white shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4 sm:px-6">
+        <div className="flex shrink-0 items-center justify-between border-b border-gray-100 px-5 py-4 sm:px-6">
           <div>
             <h2 className="font-display text-xl font-bold text-gray-900">
               Nueva Venta
@@ -80,7 +86,7 @@ function SaleModal({
           </button>
         </div>
 
-        <div className="px-5 py-6 sm:px-6">
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-6 sm:px-6">
           <div className="grid gap-6 lg:grid-cols-2">
             <div>
               <h3 className="mb-2 text-sm font-semibold text-gray-900">
@@ -135,7 +141,12 @@ function SaleModal({
                           )}
                         </div>
                         <p className="mt-0.5 text-xs text-gray-500">
-                          {formatCurrency(product.precio_actual)} ·{' '}
+                          {formatCurrency(product.precio_actual)}
+                          {esModoKilos(
+                            product.unidad_medida,
+                            product.unidad_precio
+                          ) && ' /kg'}{' '}
+                          ·{' '}
                           <span
                             className={
                               outOfStock
@@ -143,7 +154,12 @@ function SaleModal({
                                 : 'text-gray-500'
                             }
                           >
-                            {product.stock} {sufijoStock(product.unidad_medida)}{' '}
+                            {esModoKilos(
+                              product.unidad_medida,
+                              product.unidad_precio
+                            )
+                              ? `${aKilos(product.stock)} kg`
+                              : `${product.stock} ${sufijoStock(product.unidad_medida)}`}{' '}
                             {esInactivo ? 'en stock' : 'disponibles'}
                           </span>
                         </p>
@@ -191,80 +207,100 @@ function SaleModal({
                 </div>
               ) : (
                 <ul className="max-h-80 space-y-2 overflow-y-auto pr-1">
-                  {cart.map((item) => (
-                    <li
-                      key={item.id}
-                      className="rounded-xl border border-gray-200 px-3 py-2.5"
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0">
-                          <p className="truncate text-sm font-medium text-gray-900">
-                            {item.nombre}
-                          </p>
-                          <p className="mt-0.5 text-xs text-gray-500">
-                            {formatCurrency(item.precio_actual)} c/
-                            {PER_UNIDAD[item.unidad_medida] ?? 'u'}
-                          </p>
-                        </div>
-                        <button
-                          onClick={() => onRemove(item.id)}
-                          title="Quitar del carrito"
-                          className="rounded-lg p-1.5 text-gray-400 transition-colors duration-150 hover:bg-red-50 hover:text-red-600"
-                        >
-                          <Trash2 className="size-4" />
-                        </button>
-                      </div>
-                      <div className="mt-2 flex items-center justify-between">
-                        <div className="inline-flex items-center rounded-full border border-gray-300">
+                  {cart.map((item) => {
+                    const modoKilos = esModoKilos(
+                      item.unidad_medida,
+                      item.unidad_precio
+                    );
+                    const minima = modoKilos ? PASO_KILOGRAMOS : 1;
+                    const paso = modoKilos
+                      ? String(PASO_KILOGRAMOS)
+                      : '1';
+                    return (
+                      <li
+                        key={item.id}
+                        className="rounded-xl border border-gray-200 px-3 py-2.5"
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-medium text-gray-900">
+                              {item.nombre}
+                            </p>
+                            <p className="mt-0.5 text-xs text-gray-500">
+                              {modoKilos
+                                ? `${formatCurrency(
+                                    item.precio_actual
+                                  )}/kg`
+                                : `${formatCurrency(
+                                    item.precio_actual
+                                  )} c/${
+                                    PER_UNIDAD[item.unidad_medida] ?? 'u'
+                                  }`}
+                            </p>
+                          </div>
                           <button
-                            onClick={() => {
-                              clearDraft(item.id);
-                              onDecrement(item.id);
-                            }}
-                            disabled={item.cantidad <= 1}
-                            className={`${stepperButtonClass} ${side}`}
-                            title="Disminuir cantidad"
+                            onClick={() => onRemove(item.id)}
+                            title="Quitar del carrito"
+                            className="rounded-lg p-1.5 text-gray-400 transition-colors duration-150 hover:bg-red-50 hover:text-red-600"
                           >
-                            <Minus className="size-4" />
-                          </button>
-                          <input
-                            type="number"
-                            min="1"
-                            value={
-                              draftCantidades[item.id] ?? String(item.cantidad)
-                            }
-                            onChange={(e) =>
-                              setDraftCantidades((prev) => ({
-                                ...prev,
-                                [item.id]: e.target.value,
-                              }))
-                            }
-                            onBlur={(e) =>
-                              commitCantidad(item.id, e.target.value)
-                            }
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') e.currentTarget.blur();
-                            }}
-                            aria-label={`Cantidad de ${item.nombre}`}
-                            className="w-12 bg-white text-center text-sm font-semibold text-gray-900 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                          />
-                          <button
-                            onClick={() => {
-                              clearDraft(item.id);
-                              onIncrement(item.id);
-                            }}
-                            className={`${stepperButtonClass} ${sideRight}`}
-                            title="Aumentar cantidad"
-                          >
-                            <Plus className="size-4" />
+                            <Trash2 className="size-4" />
                           </button>
                         </div>
-                        <p className="font-display text-sm font-semibold text-gray-900">
-                          {formatCurrency(item.subtotal)}
-                        </p>
-                      </div>
-                    </li>
-                  ))}
+                        <div className="mt-2 flex items-center justify-between">
+                          <div className="inline-flex items-center rounded-full border border-gray-300">
+                            <button
+                              onClick={() => {
+                                clearDraft(item.id);
+                                onDecrement(item.id);
+                              }}
+                              disabled={item.cantidad <= minima}
+                              className={`${stepperButtonClass} ${side}`}
+                              title="Disminuir cantidad"
+                            >
+                              <Minus className="size-4" />
+                            </button>
+                            <input
+                              type="number"
+                              min={minima}
+                              step={paso}
+                              value={
+                                draftCantidades[item.id] ??
+                                String(item.cantidad)
+                              }
+                              onChange={(e) =>
+                                setDraftCantidades((prev) => ({
+                                  ...prev,
+                                  [item.id]: e.target.value,
+                                }))
+                              }
+                              onBlur={(e) =>
+                                commitCantidad(item.id, e.target.value)
+                              }
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter')
+                                  e.currentTarget.blur();
+                              }}
+                              aria-label={`Cantidad de ${item.nombre}`}
+                              className="w-12 bg-white text-center text-sm font-semibold text-gray-900 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            />
+                            <button
+                              onClick={() => {
+                                clearDraft(item.id);
+                                onIncrement(item.id);
+                              }}
+                              className={`${stepperButtonClass} ${sideRight}`}
+                              title="Aumentar cantidad"
+                            >
+                              <Plus className="size-4" />
+                            </button>
+                          </div>
+                          <p className="font-display text-sm font-semibold text-gray-900">
+                            {formatCurrency(item.subtotal)}
+                          </p>
+                        </div>
+                      </li>
+                    );
+                  })}
                 </ul>
               )}
             </div>
@@ -298,7 +334,7 @@ function SaleModal({
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-4 border-t border-gray-100 px-5 py-4 sm:px-6">
+        <div className="flex shrink-0 flex-wrap items-center justify-between gap-4 border-t border-gray-100 px-5 py-4 sm:px-6">
           <div>
             <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
               Total de la venta
@@ -318,7 +354,8 @@ function SaleModal({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

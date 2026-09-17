@@ -28,28 +28,33 @@ function ProductTable({ products, onEdit, onDelete, onHistory }) {
   return (
     <div className="overflow-hidden rounded-2xl border border-gray-200 border-t-2 border-t-gray-300 bg-white shadow-sm">
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
+        {/* table-fixed reparte el ancho con porcentajes fijos por columna (los
+            anchos de cada breakpoint suman 100%): en desktop todas las columnas
+            entran sin scroll horizontal y las celdas "elásticas" truncan con
+            ellipsis. En pantallas chicas se fuerza un min-width para que el
+            scroll solo aparezca ahí y las acciones nunca queden cortadas. */}
+        <table className="w-full min-w-[560px] table-fixed divide-y divide-gray-200 lg:min-w-0">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-2 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 sm:px-6">
+              <th className="w-[40%] px-2 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 sm:px-4 lg:w-[26%]">
                 Producto
               </th>
-              <th className="hidden px-2 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 md:table-cell sm:px-6">
+              <th className="hidden px-2 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 sm:px-4 lg:table-cell lg:w-[14%]">
                 Categoría
               </th>
-              <th className="hidden px-2 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 md:table-cell sm:px-6">
+              <th className="hidden px-2 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 sm:px-4 lg:table-cell lg:w-[13%]">
                 Marca
               </th>
-              <th className="hidden px-2 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 md:table-cell sm:px-6">
+              <th className="hidden px-2 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 sm:px-4 lg:table-cell lg:w-[9%]">
                 Estado
               </th>
-              <th className="px-2 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 sm:px-6">
+              <th className="w-[20%] px-2 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 sm:px-4 lg:w-[11%]">
                 Precio
               </th>
-              <th className="px-2 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 sm:px-6">
+              <th className="w-[15%] px-2 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 sm:px-4 lg:w-[9%]">
                 Stock
               </th>
-              <th className="px-2 py-3 text-right text-xs font-semibold uppercase tracking-wide text-gray-500 sm:px-6">
+              <th className="w-[25%] px-2 py-3 text-right text-xs font-semibold uppercase tracking-wide text-gray-500 sm:px-4 lg:w-[18%]">
                 Acciones
               </th>
             </tr>
@@ -68,13 +73,13 @@ function ProductTable({ products, onEdit, onDelete, onHistory }) {
                   className="transition-colors duration-150 hover:bg-gray-50"
                 >
                   <td
-                    className={`px-2 py-3 sm:px-6 sm:py-4 ${
+                    className={`px-2 py-3 sm:px-4 sm:py-4 ${
                       lowStock ? 'border-l-4 border-l-red-500' : ''
                     }`}
                   >
-                    <div className="flex items-center gap-2 sm:gap-4">
-                      <div className="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-md bg-gray-100 sm:size-11 sm:rounded-lg">
-                        <Package className="size-4 sm:size-5 text-gray-600" />
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <div className="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-md bg-gray-100 sm:size-10 sm:rounded-lg">
+                        <Package className="size-4 text-gray-600 sm:size-5" />
                       </div>
                       <div className="min-w-0">
                         <p className="truncate text-sm font-medium text-gray-900">
@@ -86,13 +91,17 @@ function ProductTable({ products, onEdit, onDelete, onHistory }) {
                       </div>
                     </div>
                   </td>
-                  <td className="hidden whitespace-nowrap px-2 py-3 md:table-cell sm:px-6 sm:py-4">
-                    <Badge category={categoria}>{categoria}</Badge>
+                  <td className="hidden px-2 py-3 sm:px-4 sm:py-4 lg:table-cell">
+                    <div className="truncate">
+                      <Badge category={categoria}>{categoria}</Badge>
+                    </div>
                   </td>
-                  <td className="hidden whitespace-nowrap px-2 py-3 md:table-cell sm:px-6 sm:py-4">
-                    <span className={marcaBadgeClass}>{marca}</span>
+                  <td className="hidden px-2 py-3 sm:px-4 sm:py-4 lg:table-cell">
+                    <div className="truncate">
+                      <span className={marcaBadgeClass}>{marca}</span>
+                    </div>
                   </td>
-                  <td className="hidden whitespace-nowrap px-2 py-3 md:table-cell sm:px-6 sm:py-4">
+                  <td className="hidden whitespace-nowrap px-2 py-3 sm:px-4 sm:py-4 lg:table-cell">
                     <span className="inline-flex items-center gap-1.5">
                       <span className={`size-2 rounded-full ${estado.dot}`} />
                       <span className={`text-sm font-medium ${estado.text}`}>
@@ -100,10 +109,10 @@ function ProductTable({ products, onEdit, onDelete, onHistory }) {
                       </span>
                     </span>
                   </td>
-                  <td className="whitespace-nowrap px-2 py-3 font-display text-xs font-semibold text-gray-900 sm:px-6 sm:py-4 sm:text-sm">
+                  <td className="whitespace-nowrap px-2 py-3 font-display text-xs font-semibold text-gray-900 sm:px-4 sm:py-4 sm:text-sm">
                     {formatCurrency(product.precio_actual)}
                   </td>
-                  <td className="whitespace-nowrap px-2 py-3 sm:px-6 sm:py-4">
+                  <td className="whitespace-nowrap px-2 py-3 sm:px-4 sm:py-4">
                     {lowStock ? (
                       <span className="inline-flex items-center gap-1.5">
                         <AlertTriangle className="hidden size-3.5 text-red-600 sm:inline sm:size-4" />
@@ -117,26 +126,26 @@ function ProductTable({ products, onEdit, onDelete, onHistory }) {
                       </span>
                     )}
                   </td>
-                  <td className="whitespace-nowrap px-2 py-3 sm:px-6 sm:py-4">
+                  <td className="whitespace-nowrap px-2 py-3 sm:px-4 sm:py-4">
                     <div className="flex items-center justify-end gap-0.5 sm:gap-1">
                       <button
                         onClick={() => onHistory(product)}
                         title="Ver historial"
-                        className="rounded-lg p-1.5 text-gray-400 transition-colors duration-150 hover:bg-gray-100 hover:text-gray-600 sm:p-2"
+                        className="rounded-lg p-1.5 text-gray-400 transition-colors duration-150 hover:bg-gray-100 hover:text-gray-600"
                       >
                         <History className="size-4" />
                       </button>
                       <button
                         onClick={() => onEdit(product)}
                         title="Editar"
-                        className="rounded-lg p-1.5 text-gray-400 transition-colors duration-150 hover:bg-gray-100 hover:text-gray-600 sm:p-2"
+                        className="rounded-lg p-1.5 text-gray-400 transition-colors duration-150 hover:bg-gray-100 hover:text-gray-600"
                       >
                         <Pencil className="size-4" />
                       </button>
                       <button
                         onClick={() => onDelete(product)}
                         title="Eliminar"
-                        className="rounded-lg p-1.5 text-gray-400 transition-colors duration-150 hover:bg-red-50 hover:text-red-600 sm:p-2"
+                        className="rounded-lg p-1.5 text-gray-400 transition-colors duration-150 hover:bg-red-50 hover:text-red-600"
                       >
                         <Trash2 className="size-4" />
                       </button>

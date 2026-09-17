@@ -39,14 +39,13 @@ function CatalogModal({
     }`;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-gray-900/40 p-4 sm:items-center"
-    >
+    <div className="absolute inset-0 z-50 bg-gray-900/40">
+      <div className="sticky top-0 flex h-screen max-h-full w-full items-center justify-center p-4">
       <div
-        className="my-8 w-full max-w-md rounded-3xl bg-white shadow-xl"
+        className="flex max-h-[min(90vh,100%)] w-full max-w-md flex-col rounded-3xl bg-white shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4 sm:px-6">
+        <div className="flex shrink-0 items-center justify-between border-b border-gray-100 px-5 py-4 sm:px-6">
           <div>
             <h2 className="font-display text-xl font-bold text-gray-900">
               {isEditing ? `Editar ${labelSingular}` : `Nueva ${labelSingular}`}
@@ -66,26 +65,31 @@ function CatalogModal({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 px-5 py-6 sm:px-6">
-          <div>
-            <label className="mb-1.5 block text-sm font-medium text-gray-700" htmlFor="nombre">
-              Nombre <span className="text-red-500">*</span>
-            </label>
-            <input
-              id="nombre"
-              type="text"
-              value={nombre}
-              onChange={(e) => {
-                setNombre(e.target.value);
-                if (error) setError('');
-              }}
-              placeholder={`${labelSingular[0].toUpperCase()}${labelSingular.slice(1)}...`}
-              className={fieldClass(Boolean(error))}
-            />
-            {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+        <form
+          onSubmit={handleSubmit}
+          className="flex min-h-0 flex-1 flex-col"
+        >
+          <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-5 py-6 sm:px-6">
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-gray-700" htmlFor="nombre">
+                Nombre <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="nombre"
+                type="text"
+                value={nombre}
+                onChange={(e) => {
+                  setNombre(e.target.value);
+                  if (error) setError('');
+                }}
+                placeholder={`${labelSingular[0].toUpperCase()}${labelSingular.slice(1)}...`}
+                className={fieldClass(Boolean(error))}
+              />
+              {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+            </div>
           </div>
 
-          <div className="flex flex-wrap items-center justify-end gap-3 border-t border-gray-100 pt-5">
+          <div className="flex shrink-0 flex-wrap items-center justify-end gap-3 border-t border-gray-100 px-5 py-4 sm:px-6">
             {submitError && (
               <p className="w-full rounded-xl bg-red-50 px-3 py-2 text-xs text-red-600 ring-1 ring-inset ring-red-600/10 sm:mr-auto sm:w-auto">
                 {submitError}
@@ -99,6 +103,7 @@ function CatalogModal({
             </Button>
           </div>
         </form>
+      </div>
       </div>
     </div>
   );

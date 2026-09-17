@@ -4,12 +4,28 @@ import Button from './Button';
 import { useCategorias } from '../hooks/useCategorias';
 import { useMarcas } from '../hooks/useMarcas';
 import { obtenerStockMinimoPorUnidad } from '../utils/stockMinimoStorage';
+import {
+  esModoKilos,
+  aKilos,
+  aGramos,
+  convertirEntreKilosYGramos,
+} from '../utils/unidadPrecio'
 
 const ESTADOS = ['activo', 'inactivo'];
 const UNIDADES = [
   { value: 'Unidad', label: 'Unidad (u.)' },
   { value: 'Gramos', label: 'Gramos (g)' },
 ];
+// Los valores coinciden con la serialización del enum UnidadPrecio del
+// backend ("Por-Kilo" | "Por-100-Gramos"); solo aplica si la unidad es "Gramos".
+const UNIDADES_PRECIO = [
+  { value: 'Por-Kilo', label: 'Por Kilo' },
+  { value: 'Por-100-Gramos', label: 'Cada 100 gramos' },
+];
+const ETIQUETAS_PRECIO = {
+  'Por-Kilo': 'Precio por Kilo (ARS)',
+  'Por-100-Gramos': 'Precio cada 100 Gramos (ARS)',
+};
 
 const validarNombre = (value) =>
   !value.trim() ? 'El nombre es obligatorio.' : '';
@@ -18,6 +34,10 @@ const validarCategoria = (value) =>
 const validarMarca = (value) => (!value ? 'La marca es obligatoria.' : '');
 const validarUnidadMedida = (value) =>
   !value ? 'La unidad de medida es obligatoria.' : '';
+const validarUnidadPrecio = (value, unidadMedida) =>
+  unidadMedida === 'Gramos' && !value
+    ? 'La unidad de precio es obligatoria.'
+    : '';
 const validarPrecio = (value) => {
   if (!value) return 'El precio es obligatorio.';
   return Number(value) <= 0 ? 'El precio debe ser mayor a 0.' : '';
@@ -43,13 +63,25 @@ function ProductModal({ product = null, products = [], onClose, onSave, submitEr
           categoria_id: product.categoria_id ?? '',
           marca_id: product.marca_id ?? '',
           precio_actual: String(product.precio_actual),
-          stock: String(product.stock),
+          // En modo "kilos" (Gramos + Por-Kilo) muestro el stock dividido por
+          // 1000; el resto de los casos queda en su unidad natural (g / u.).
+          stock: String(
+            esModoKilos(product.unidad_medida, product.unidad_precio)
+              ? aKilos(product.stock)
+              : product.stock
+          ),
           // Al editar, muestro el valor persistido (ya resuelto desde
           // localStorage en el producto normalizado) o el default.
-          stock_minimo: String(product.stock_minimo ?? 5),
+          stock_minimo: String(
+            esModoKilos(product.unidad_medida, product.unidad_precio)
+              ? aKilos(product.stock_minimo ?? 500)
+              : product.stock_minimo ?? 5
+          ),
           estado: product.estado ?? 'activo',
           // default "Unidad": en un almacén/dietética la mayoría se vende por unidad.
           unidad_medida: product.unidad_medida ?? 'Unidad',
+          // Viene del backend como string ("Por-Kilo" | "Por-100-Gramos") o null.
+          unidad_precio: product.unidad_precio ?? '',
         }
       : {
           codigo: '',
@@ -62,6 +94,7 @@ function ProductModal({ product = null, products = [], onClose, onSave, submitEr
           stock_minimo: String(obtenerStockMinimoPorUnidad('Unidad')),
           estado: 'activo',
           unidad_medida: 'Unidad',
+          unidad_precio: '',
         }
   );
   const [errors, setErrors] = useState({});
@@ -69,6 +102,10 @@ function ProductModal({ product = null, products = [], onClose, onSave, submitEr
   // En creación: solo se auto-completa el default si el usuario todavía no
   // tocó el campo Stock Mínimo (sobreescribible en cualquier momento).
   const [stockMinimoTocado, setStockMinimoTocado] = useState(isEditing);
+
+  // El modo "kilos" solo aplica cuando la unidad de medida es "Gramos" y la
+  // unidad de precio elegida es "Por-Kilo".
+  const modoKilos = esModoKilos(form.unidad_medida, form.unidad_precio);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -79,10 +116,33 @@ function ProductModal({ product = null, products = [], onClose, onSave, submitEr
       return;
     }
 
-    if (name === 'unidad_medida' && !stockMinimoTocado) {
+    if (name === 'unidad_precio') {
+      const antesKilos = form.unidad_precio === 'Por-Kilo';
+      const ahoraKilos = value === 'Por-Kilo';
+      // Solo se convierte en modo gramos y cuando cambia el modo: el valor
+      // cargado en los inputs se pasa al nuevo formato en tiempo real para no
+      // distorsionar el dato (g → kg al pasar a "Por-Kilo", kg → g al salir).
+      if (form.unidad_medida === 'Gramos' && antesKilos !== ahoraKilos) {
+        setForm((prev) => ({
+          ...prev,
+          stock: convertirEntreKilosYGramos(prev.stock, antesKilos),
+          stock_minimo: convertirEntreKilosYGramos(
+            prev.stock_minimo,
+            antesKilos
+          ),
+        }));
+      }
+      return;
+    }
+
+    if (name === 'unidad_medida') {
       setForm((prev) => ({
         ...prev,
-        stock_minimo: String(obtenerStockMinimoPorUnidad(value)),
+        ...(!stockMinimoTocado && {
+          stock_minimo: String(obtenerStockMinimoPorUnidad(value)),
+        }),
+        // Si la unidad es "Unidad", la unidad de precio no aplica: se limpia.
+        unidad_precio: value === 'Unidad' ? '' : prev.unidad_precio,
       }));
     }
   };
@@ -110,6 +170,7 @@ function ProductModal({ product = null, products = [], onClose, onSave, submitEr
       stock: validarStock(form.stock),
       stock_minimo: validarStockMinimo(form.stock_minimo),
       unidad_medida: validarUnidadMedida(form.unidad_medida),
+      unidad_precio: validarUnidadPrecio(form.unidad_precio, form.unidad_medida),
     };
     return Object.fromEntries(
       Object.entries(nextErrors).filter(([, message]) => message)
@@ -129,10 +190,20 @@ function ProductModal({ product = null, products = [], onClose, onSave, submitEr
       categoria_id: form.categoria_id ? Number(form.categoria_id) : null,
       marca_id: form.marca_id ? Number(form.marca_id) : null,
       precio_actual: Number(form.precio_actual),
-      stock: Number(form.stock),
-      stock_minimo: Number(form.stock_minimo),
+      // En modo "kilos" el input está en kg: se multiplica por 1000 para que la
+      // API siga recibiendo gramos (redondeado porque el backend es entero).
+      stock: modoKilos ? aGramos(Number(form.stock)) : Number(form.stock),
+      stock_minimo: modoKilos
+        ? aGramos(Number(form.stock_minimo))
+        : Number(form.stock_minimo),
       estado: form.estado,
       unidad_medida: form.unidad_medida,
+      // Solo aplica para "Gramos": si es "Unidad" va null (el backend lo
+      // espera nullable y su conversor solo acepta "Por-Kilo"/"Por-100-Gramos").
+      unidad_precio:
+        form.unidad_medida === 'Gramos' && form.unidad_precio
+          ? form.unidad_precio
+          : null,
     };
 
     onSave(isEditing ? { ...payload, id: product.id } : payload);
@@ -148,14 +219,13 @@ function ProductModal({ product = null, products = [], onClose, onSave, submitEr
   const labelClass = 'mb-1.5 block text-sm font-medium text-gray-700';
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-gray-900/40 p-4 sm:items-center"
-    >
+    <div className="absolute inset-0 z-50 bg-gray-900/40">
+      <div className="sticky top-0 flex h-screen max-h-full w-full items-center justify-center p-4">
       <div
-        className="my-8 w-full max-w-lg rounded-3xl bg-white shadow-xl"
+        className="flex max-h-[min(90vh,100%)] w-full max-w-lg flex-col rounded-3xl bg-white shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4 sm:px-6">
+        <div className="flex shrink-0 items-center justify-between border-b border-gray-100 px-5 py-4 sm:px-6">
           <div>
             <h2 className="font-display text-xl font-bold text-gray-900">
               {isEditing ? 'Editar Producto' : 'Nuevo Producto'}
@@ -175,9 +245,13 @@ function ProductModal({ product = null, products = [], onClose, onSave, submitEr
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 px-5 py-6 sm:px-6">
-          <div>
-            <label className={labelClass} htmlFor="codigo">
+        <form
+          onSubmit={handleSubmit}
+          className="flex min-h-0 flex-1 flex-col"
+        >
+          <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-5 py-6 sm:px-6">
+            <div>
+              <label className={labelClass} htmlFor="codigo">
               Código
             </label>
             <input
@@ -261,6 +335,33 @@ function ProductModal({ product = null, products = [], onClose, onSave, submitEr
             )}
           </div>
 
+          {form.unidad_medida === 'Gramos' && (
+            <div>
+              <label className={labelClass} htmlFor="unidad_precio">
+                Unidad de Precio <span className="text-red-500">*</span>
+              </label>
+              <select
+                id="unidad_precio"
+                name="unidad_precio"
+                value={form.unidad_precio}
+                onChange={handleChange}
+                className={`${fieldClass(Boolean(errors.unidad_precio))} cursor-pointer`}
+              >
+                <option value="">Seleccioná la unidad de precio...</option>
+                {UNIDADES_PRECIO.map(({ value, label }) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+              {errors.unidad_precio && (
+                <p className="mt-1 text-xs text-red-600">
+                  {errors.unidad_precio}
+                </p>
+              )}
+            </div>
+          )}
+
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className={labelClass} htmlFor="marca_id">
@@ -307,7 +408,8 @@ function ProductModal({ product = null, products = [], onClose, onSave, submitEr
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className={labelClass} htmlFor="precio_actual">
-                Precio (ARS) <span className="text-red-500">*</span>
+                {ETIQUETAS_PRECIO[form.unidad_precio] ?? 'Precio (ARS)'}{' '}
+                <span className="text-red-500">*</span>
               </label>
               <input
                 id="precio_actual"
@@ -328,17 +430,18 @@ function ProductModal({ product = null, products = [], onClose, onSave, submitEr
             </div>
             <div>
               <label className={labelClass} htmlFor="stock">
-                Stock (unidades) <span className="text-red-500">*</span>
+                {modoKilos ? 'Stock (kg)' : 'Stock (unidades)'}{' '}
+                <span className="text-red-500">*</span>
               </label>
               <input
                 id="stock"
                 name="stock"
                 type="number"
                 min="0"
-                step="1"
+                step={modoKilos ? '0.01' : '1'}
                 value={form.stock}
                 onChange={handleChange}
-                placeholder="0"
+                placeholder={modoKilos ? '0.0' : '0'}
                 className={fieldClass(Boolean(errors.stock))}
               />
               {errors.stock && (
@@ -347,17 +450,18 @@ function ProductModal({ product = null, products = [], onClose, onSave, submitEr
             </div>
             <div className="sm:col-span-2">
               <label className={labelClass} htmlFor="stock_minimo">
-                Stock Mínimo (unidades) <span className="text-red-500">*</span>
+                {modoKilos ? 'Stock Mínimo (kg)' : 'Stock Mínimo (unidades)'}{' '}
+                <span className="text-red-500">*</span>
               </label>
               <input
                 id="stock_minimo"
                 name="stock_minimo"
                 type="number"
                 min="0"
-                step="1"
+                step={modoKilos ? '0.01' : '1'}
                 value={form.stock_minimo}
                 onChange={handleChange}
-                placeholder="5"
+                placeholder={modoKilos ? '0.5' : '5'}
                 className={fieldClass(Boolean(errors.stock_minimo))}
               />
               {errors.stock_minimo && (
@@ -366,9 +470,11 @@ function ProductModal({ product = null, products = [], onClose, onSave, submitEr
                 </p>
               )}
             </div>
+            </div>
+
           </div>
 
-          <div className="flex flex-wrap items-center justify-end gap-3 border-t border-gray-100 pt-5">
+          <div className="flex shrink-0 flex-wrap items-center justify-end gap-3 border-t border-gray-100 px-5 py-4 sm:px-6">
             {submitError && (
               <p className="w-full rounded-xl bg-red-50 px-3 py-2 text-xs text-red-600 ring-1 ring-inset ring-red-600/10 sm:mr-auto sm:w-auto">
                 {submitError}
@@ -382,6 +488,7 @@ function ProductModal({ product = null, products = [], onClose, onSave, submitEr
             </Button>
           </div>
         </form>
+      </div>
       </div>
     </div>
   );

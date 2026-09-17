@@ -6,6 +6,7 @@ import {
   obtenerStockMinimo,
   eliminarStockMinimo,
 } from '../utils/stockMinimoStorage';
+import { stockEnUnidadDePrecio } from '../utils/unidadPrecio';
 
 // El backend no expone "stock_minimo" (no existe en su esquema). El valor se
 // resuelve desde localStorage (ver utils/stockMinimoStorage.js) con un default
@@ -27,6 +28,9 @@ function normalizarProducto(p) {
     // unidadMedida viaja como string ("Gramos" | "Unidad"). Los productos
     // creados antes de este campo se guardaron con el default "Gramos".
     unidad_medida: unidadMedida,
+    // unidadPrecio viaja como string ("Por-Kilo" | "Por-100-Gramos") o null
+    // cuando la unidad de medida es "Unidad" (no aplica).
+    unidad_precio: p.unidadPrecio ?? null,
   };
 }
 
@@ -42,10 +46,16 @@ function normalizarProductoParaBackend(product) {
     categoriaId: Number(product.categoria_id),
     marcaId: Number(product.marca_id),
     precioActual: Number(product.precio_actual),
+    // stock/stock_minimo viajan SIEMPRE en gramos (o unidades): la conversión
+    // a kilos del formulario (unidad_precio = "Por-Kilo") es solo de
+    // presentación y el modal ya envía convertido (ver utils/unidadPrecio.js).
     stock: Number(product.stock),
     estado: estadoBooleano,
     // El backend rechaza null: normalizamos a "Unidad" o "Gramos".
     unidadMedida: product.unidad_medida === 'Unidad' ? 'Unidad' : 'Gramos',
+    // El conversor del backend solo acepta "Por-Kilo" | "Por-100-Gramos"
+    // (o null, que es el caso cuando la unidad de medida es "Unidad").
+    unidadPrecio: product.unidad_precio || null,
   };
 }
 
@@ -55,6 +65,7 @@ export function useProducts() {
   const [error, setError] = useState('');
   const [query, setQuery] = useState('');
   const [sortBy, setSortBy] = useState('name');
+  const [sortDir, setSortDir] = useState('asc');
   const [onlyLowStock, setOnlyLowStock] = useState(false);
 
   const refreshProducts = useCallback(async () => {
@@ -125,8 +136,11 @@ export function useProducts() {
 
   const totalProducts = products.length;
   const totalStock = products.reduce((sum, p) => sum + p.stock, 0);
+  // El precio está expresado por unidad de precio (por kilo / cada 100 g):
+  // el stock (en gramos) se convierte a esa unidad antes de multiplicar, para
+  // no inflar el valor (ej: $1.000/kg × 4000g = $4.000, no $4.000.000).
   const inventoryValue = products.reduce(
-    (sum, p) => sum + p.precio_actual * p.stock,
+    (sum, p) => sum + p.precio_actual * stockEnUnidadDePrecio(p.stock, p.unidad_precio),
     0
   );
 
@@ -143,18 +157,22 @@ export function useProducts() {
       visible = filtrarStockBajo(visible);
     }
 
+    const sortFactor = sortDir === 'desc' ? -1 : 1;
+
+    // La dirección se aplica de forma consistente a los 3 campos: Nombre
+    // (A-Z/Z-A), Precio y Stock (menor-mayor/mayor-menor).
     return [...visible].sort((a, b) => {
       switch (sortBy) {
         case 'price':
-          return a.precio_actual - b.precio_actual;
+          return (a.precio_actual - b.precio_actual) * sortFactor;
         case 'stock':
-          return a.stock - b.stock;
+          return (a.stock - b.stock) * sortFactor;
         case 'name':
         default:
-          return a.nombre.localeCompare(b.nombre);
+          return a.nombre.localeCompare(b.nombre) * sortFactor;
       }
     });
-  }, [products, query, sortBy, onlyLowStock]);
+  }, [products, query, sortBy, sortDir, onlyLowStock]);
 
   return {
     products: filteredProducts,
@@ -172,6 +190,8 @@ export function useProducts() {
     setQuery,
     sortBy,
     setSortBy,
+    sortDir,
+    setSortDir,
     onlyLowStock,
     setOnlyLowStock,
   };
